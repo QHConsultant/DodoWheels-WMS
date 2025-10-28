@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "Frontend for a comprehensive Warehouse Management System with a modern, macOS-inspired interface.",
   "scripts": {
-    "build": "mkdir -p dist && esbuild index.tsx --bundle --outfile=dist/bundle.js --platform=browser --external:recharts && cp index.html dist/"
+    "build": "mkdir -p dist && esbuild index.tsx --bundle --outfile=dist/bundle.js --platform=browser && cp index.html dist/"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "recharts": "^2.12.7"
   },
   "devDependencies": {
     "esbuild": "^0.20.2",

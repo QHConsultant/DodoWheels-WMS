@@ -1,18 +1,12 @@
 import { Order } from '../types';
+import { MOCK_ORDERS } from '../constants';
 
-// This function now fetches from the API
+// This function simulates a network request.
 export const fetchOrders = async (): Promise<Order[]> => {
-  console.log('Fetching orders from QBO API...');
-  const response = await fetch('/api/orders');
-  
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: 'Failed to fetch orders from the server.' }));
-    if (response.status === 401 || response.status === 503) {
-      throw new Error('QuickBooks Online connection required. Please connect from the Outbound page.');
-    }
-    throw new Error(errorData.message || `Server responded with status ${response.status}`);
-  }
-  
-  const data = await response.json();
-  return data;
+  console.log('Fetching mock orders...');
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(MOCK_ORDERS);
+    }, 500); // Simulate network delay
+  });
 };

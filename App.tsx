@@ -20,7 +20,10 @@ export interface AppError {
 const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>('dashboard');
   const [theme, setTheme] = useState<Theme>('system');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    // Check session storage on initial load to maintain login state across refreshes
+    return sessionStorage.getItem('wms-is-authenticated') === 'true';
+  });
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('wms-theme') as Theme | null;
@@ -58,11 +61,15 @@ const App: React.FC = () => {
 
   const handleLogin = (success: boolean) => {
     if (success) {
+      // Persist authentication state in session storage
+      sessionStorage.setItem('wms-is-authenticated', 'true');
       setIsAuthenticated(true);
     }
   };
 
   const handleLogout = () => {
+    // Clear authentication state from session storage
+    sessionStorage.removeItem('wms-is-authenticated');
     setIsAuthenticated(false);
     setActiveView('dashboard'); // Reset to default view on logout
   };

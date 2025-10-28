@@ -1,16 +1,11 @@
 import { InventoryItem } from '../types';
+import { MOCK_INVENTORY } from '../constants';
 
 export const fetchInventory = async (): Promise<InventoryItem[]> => {
-    console.log('Fetching inventory from QBO API...');
-    const response = await fetch('/api/inventory');
-    
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Failed to fetch inventory from the server.' }));
-        if (response.status === 401 || response.status === 503) {
-            throw new Error('QuickBooks Online connection required. Please connect from the Outbound page.');
-        }
-        throw new Error(errorData.message || `Server responded with status ${response.status}`);
-    }
-    
-    return response.json();
+    console.log('Fetching mock inventory data...');
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(MOCK_INVENTORY);
+      }, 500); // Simulate network delay
+    });
 };

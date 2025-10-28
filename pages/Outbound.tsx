@@ -1,14 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Order, OrderStatus } from '../types';
+import { fetchOrders } from '../services/qboService';
 import { ArrowUpOnSquareIcon } from '../components/icons/ArrowUpOnSquareIcon';
 import { OrderDetailsModal } from '../components/OrderDetailsModal';
 import { OrderStatusBadge } from '../components/OrderStatusBadge';
 import { RefreshIcon } from '../components/icons/RefreshIcon';
-import { ConfigurationError } from '../components/ConfigurationError';
-import { QBOIcon } from '../components/icons/QBOIcon';
-
-type QBOStatus = 'loading' | 'connected' | 'disconnected' | 'error';
-interface ConfigError { message: string; action: string; }
 
 const KanbanCard: React.FC<{ order: Order; onClick: () => void }> = ({ order, onClick }) => (
   <div
@@ -89,24 +85,12 @@ const Outbound: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [qboStatus, setQboStatus] = useState<QBOStatus>('loading');
-  const [configError, setConfigError] = useState<ConfigError | null>(null);
-  
+
   const loadOrders = useCallback(async () => {
-    if (qboStatus !== 'connected') return;
-    
     setIsLoading(true);
     setError(null);
     try {
-        const response = await fetch('/api/orders');
-        if (!response.ok) {
-            if (response.status === 401) {
-                setQboStatus('disconnected');
-            }
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || 'Failed to fetch orders from QBO.');
-        }
-        const fetchedOrders: Order[] = await response.json();
+        const fetchedOrders = await fetchOrders();
         setOrders(fetchedOrders);
     } catch (err: any) {
         console.error("Failed to fetch orders:", err);
@@ -114,38 +98,12 @@ const Outbound: React.FC = () => {
     } finally {
         setIsLoading(false);
     }
-  }, [qboStatus]);
-
-  useEffect(() => {
-    // Check for config errors from backend redirect
-    const params = new URLSearchParams(window.location.search);
-    const errorMsg = params.get('error');
-    const errorAction = params.get('action');
-    if (errorMsg && errorAction) {
-        setConfigError({ message: errorMsg, action: errorAction });
-        setQboStatus('error'); // Set status to error to prevent other UI from showing
-        return;
-    }
-
-    const checkStatus = async () => {
-        try {
-            const response = await fetch('/api/status');
-            if (!response.ok) throw new Error('Could not check QBO status.');
-            const data = await response.json();
-            setQboStatus(data.isConnected ? 'connected' : 'disconnected');
-        } catch (err) {
-            console.error(err);
-            setQboStatus('error');
-        }
-    };
-    checkStatus();
   }, []);
 
+
   useEffect(() => {
-    if (qboStatus === 'connected') {
-        loadOrders();
-    }
-  }, [qboStatus, loadOrders]);
+    loadOrders();
+  }, [loadOrders]);
 
 
   const handleStatusUpdate = (orderId: string, newStatus: OrderStatus) => {
@@ -164,45 +122,6 @@ const Outbound: React.FC = () => {
   ];
   
   const renderContent = () => {
-    if (configError) {
-        return <ConfigurationError message={configError.message} action={configError.action} />;
-    }
-    if (qboStatus === 'loading') {
-        return (
-            <div className="w-full flex justify-center items-center py-20">
-                <svg className="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-            </div>
-        );
-    }
-    if (qboStatus === 'disconnected') {
-        return (
-            <div className="w-full text-center py-20 flex justify-center items-center">
-              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-8 max-w-lg">
-                <QBOIcon className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">Connect to QuickBooks Online</h2>
-                <p className="text-slate-500 dark:text-slate-400 mt-2 mb-6">To manage outbound orders, you need to connect your QuickBooks Online account. This will sync your sales receipts and allow for real-time order processing.</p>
-                <button 
-                  onClick={() => window.location.href = '/auth'}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800"
-                >
-                  Connect to QuickBooks
-                </button>
-              </div>
-            </div>
-        );
-    }
-    if (qboStatus === 'error') {
-       return (
-            <div className="w-full text-center py-20">
-               <h3 className="text-lg font-semibold text-red-500">Connection Error</h3>
-               <p className="text-slate-500">Could not connect to the backend service. Please check your network or try again later.</p>
-           </div>
-       );
-   }
-
     if (error) {
         return (
             <div className="w-full text-center py-20">
@@ -211,7 +130,7 @@ const Outbound: React.FC = () => {
             </div>
         )
     }
-    if (isLoading) {
+    if (isLoading && orders.length === 0) {
         return <KanbanSkeleton />;
     }
 
@@ -247,7 +166,7 @@ const Outbound: React.FC = () => {
             <div className="flex items-center space-x-4">
               <button
                 onClick={loadOrders}
-                disabled={isLoading || qboStatus !== 'connected'}
+                disabled={isLoading}
                 className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <RefreshIcon className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />

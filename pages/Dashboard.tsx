@@ -52,19 +52,9 @@ const Dashboard: React.FC = () => {
   
   const renderContent = () => {
     if (error) {
-      const isAuthError = String(error).includes('QuickBooks Online connection required');
       return (
-        <div className="w-full text-center py-20 bg-white dark:bg-slate-800 rounded-xl shadow-md">
-            <h3 className="text-lg font-semibold text-red-500">An Error Occurred</h3>
-            <p className="text-slate-500 mb-4">{String(error)}</p>
-            {isAuthError && (
-                <button 
-                    onClick={() => window.location.href = '?view=outbound'}
-                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                    Go to Outbound Page to Connect
-                </button>
-            )}
+        <div className="text-center py-20">
+          <p className="text-red-500">{String(error)}</p>
         </div>
       );
     }
