@@ -1,12 +1,14 @@
 import React from 'react';
 import { Order } from '../types';
 import { OrderStatusBadge } from './OrderStatusBadge';
+import { translations, Language } from '../translations';
 
 interface OrderTableProps {
   orders: Order[];
   isLoading: boolean;
   error: string | null;
   onRowClick: (order: Order) => void;
+  language: Language;
 }
 
 const TableSkeleton: React.FC = () => (
@@ -33,16 +35,27 @@ const TableSkeleton: React.FC = () => (
   </>
 );
 
-export const OrderTable: React.FC<OrderTableProps> = ({ orders, isLoading, error, onRowClick }) => {
+const getLocaleConfig = (lang: Language) => {
+    switch (lang) {
+        case 'zh': return { locale: 'zh-CN', currency: 'CNY' };
+        case 'fr': return { locale: 'fr-FR', currency: 'EUR' };
+        default: return { locale: 'en-US', currency: 'USD' };
+    }
+};
+
+export const OrderTable: React.FC<OrderTableProps> = ({ orders, isLoading, error, onRowClick, language }) => {
+  const t = translations[language].orderTable;
+  const { locale, currency } = getLocaleConfig(language);
+
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: 'USD',
+      currency: currency,
     }).format(amount);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('zh-CN', {
+    return new Date(dateString).toLocaleDateString(locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -52,17 +65,17 @@ export const OrderTable: React.FC<OrderTableProps> = ({ orders, isLoading, error
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden">
       <div className="p-6">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">最近订单</h2>
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t.title}</h2>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
           <thead className="bg-slate-50 dark:bg-slate-700/50">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">订单号</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">客户</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden md:table-cell">日期</th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">状态</th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden sm:table-cell">金额</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.orderId}</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.customer}</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden md:table-cell">{t.date}</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.status}</th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden sm:table-cell">{t.amount}</th>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
@@ -77,7 +90,7 @@ export const OrderTable: React.FC<OrderTableProps> = ({ orders, isLoading, error
             {!isLoading && !error && orders.length === 0 && (
               <tr>
                 <td colSpan={5} className="text-center py-12 px-6">
-                  <p className="text-slate-500 dark:text-slate-400">未找到订单。</p>
+                  <p className="text-slate-500 dark:text-slate-400">{t.noOrders}</p>
                 </td>
               </tr>
             )}

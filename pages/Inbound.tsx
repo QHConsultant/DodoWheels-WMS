@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { fetchPurchaseOrders } from '../services/inboundService';
+import { fetchPurchaseOrders, updatePurchaseOrder } from '../services/inboundService';
 import { PurchaseOrder, PurchaseOrderStatus } from '../types';
 import { InboxArrowDownIcon } from '../components/icons/InboxArrowDownIcon';
 import { ReceiveItemsModal } from '../components/ReceiveItemsModal';
@@ -43,10 +43,15 @@ const Inbound: React.FC = () => {
     loadPOs();
   }, [loadPOs]);
   
-  const handleUpdatePO = (updatedPO: PurchaseOrder) => {
-    // This is a local update to simulate receiving items.
-    setPurchaseOrders(prevPOs => prevPOs.map(po => po.id === updatedPO.id ? updatedPO : po));
-    setSelectedPO(null);
+  const handleUpdatePO = async (updatedPO: PurchaseOrder) => {
+    try {
+        await updatePurchaseOrder(updatedPO);
+        setPurchaseOrders(prevPOs => prevPOs.map(po => po.id === updatedPO.id ? updatedPO : po));
+        setSelectedPO(null);
+    } catch (err) {
+        console.error("Failed to update PO:", err);
+        // Optionally show error to user
+    }
   };
 
   const renderContent = () => {

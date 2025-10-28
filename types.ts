@@ -83,3 +83,16 @@ export interface AdjustmentLineItem {
   selectedLocation?: string;
   status: AdjustmentStatus;
 }
+
+export interface QboSyncItem {
+  id: string;
+  date: string;
+  type: DocType;
+  docNumber: string;
+  customer: string;
+  sku: string;
+  product: string;
+  description: string;
+  qty: number;
+  shippingTo: string;
+}

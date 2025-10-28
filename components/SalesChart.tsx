@@ -1,20 +1,30 @@
-
-
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Order, OrderStatus } from '../types';
+import { translations, Language } from '../translations';
+
 
 interface SalesChartProps {
   orders: Order[];
   isLoading: boolean;
+  language: Language;
 }
 
-const processChartData = (orders: Order[]) => {
+const getLocaleConfig = (lang: Language) => {
+    switch (lang) {
+        case 'zh': return { locale: 'zh-CN', currency: 'CNY' };
+        case 'fr': return { locale: 'fr-FR', currency: 'EUR' };
+        default: return { locale: 'en-US', currency: 'USD' };
+    }
+};
+
+const processChartData = (orders: Order[], language: Language) => {
   const monthlySales: { [key: string]: number } = {};
+  const { locale } = getLocaleConfig(language);
   
   orders.forEach(order => {
     if (order.status !== OrderStatus.Cancelled) {
-      const month = new Date(order.orderDate).toLocaleString('zh-CN', { month: 'short', year: '2-digit' });
+      const month = new Date(order.orderDate).toLocaleString(locale, { month: 'short', year: '2-digit' });
       if (!monthlySales[month]) {
         monthlySales[month] = 0;
       }
@@ -22,36 +32,56 @@ const processChartData = (orders: Order[]) => {
     }
   });
 
+  const frMonths: { [key: string]: number } = { 'janv.': 0, 'févr.': 1, 'mars': 2, 'avr.': 3, 'mai': 4, 'juin': 5, 'juil.': 6, 'août': 7, 'sept.': 8, 'oct.': 9, 'nov.': 10, 'déc.': 11 };
+
   const sortedMonths = Object.keys(monthlySales).sort((a, b) => {
-    // FIX: A more robust date parsing for 'YY年M月' format from zh-CN locale
-    const [yearA, monthA] = a.replace('年', ' ').replace('月', '').split(' ');
-    const [yearB, monthB] = b.replace('年', ' ').replace('月', '').split(' ');
-    // FIX: The new Date() constructor expects numbers for year and month when multiple arguments are provided.
-    const dateA = new Date(parseInt(`20${yearA}`), parseInt(monthA) - 1);
-    const dateB = new Date(parseInt(`20${yearB}`), parseInt(monthB) - 1);
+    const parseDate = (monthStr: string) => {
+        if (language === 'zh') {
+            const [year, month] = monthStr.replace('年', ' ').replace('月', '').split(' ');
+            return new Date(parseInt(`20${year}`), parseInt(month) - 1);
+        }
+        if (language === 'fr') {
+            const parts = monthStr.split(' ');
+            const monthPart = parts[0];
+            const yearPart = parts[1];
+            const monthIndex = frMonths[monthPart];
+            return new Date(parseInt(`20${yearPart}`), monthIndex);
+        }
+        // For 'en-US' like "Oct '23"
+        const [month, year] = monthStr.split(" '");
+        const monthIndex = new Date(Date.parse(month +" 1, 2012")).getMonth();
+        return new Date(parseInt(`20${year}`), monthIndex);
+    };
+    const dateA = parseDate(a);
+    const dateB = parseDate(b);
     return dateA.getTime() - dateB.getTime();
   });
 
   return sortedMonths.map(month => ({
     name: month,
-    "销售额": monthlySales[month],
+    [translations[language].salesChart.sales]: monthlySales[month],
   }));
 };
 
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label, language }: any) => {
+  const t = translations[language].salesChart;
   if (active && payload && payload.length) {
+    const { locale, currency } = getLocaleConfig(language);
     return (
       <div className="p-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md shadow-lg">
         <p className="label font-semibold">{`${label}`}</p>
-        <p className="intro text-indigo-500 dark:text-indigo-400">{`销售额: ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(payload[0].value)}`}</p>
+        <p className="intro text-indigo-500 dark:text-indigo-400">{`${t.sales}: ${new Intl.NumberFormat(locale, { style: 'currency', currency: currency }).format(payload[0].value)}`}</p>
       </div>
     );
   }
   return null;
 };
 
-export const SalesChart: React.FC<SalesChartProps> = ({ orders, isLoading }) => {
+export const SalesChart: React.FC<SalesChartProps> = ({ orders, isLoading, language }) => {
+  const t = translations[language].salesChart;
+  const { currency } = getLocaleConfig(language);
+  
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 h-96 animate-pulse">
@@ -61,11 +91,11 @@ export const SalesChart: React.FC<SalesChartProps> = ({ orders, isLoading }) => 
     );
   }
   
-  const chartData = processChartData(orders);
+  const chartData = processChartData(orders, language);
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6">
-      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">月度销售额</h2>
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">{t.title}</h2>
       <div style={{ width: '100%', height: 300 }}>
         <ResponsiveContainer>
           <BarChart
@@ -78,7 +108,6 @@ export const SalesChart: React.FC<SalesChartProps> = ({ orders, isLoading }) => 
             }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(100, 116, 139, 0.2)" />
-            {/* FIX: Complete the BarChart component definition. The file was truncated. */}
             <XAxis 
               dataKey="name" 
               tick={{ fill: 'rgb(100 116 139)', fontSize: 12 }} 
@@ -89,14 +118,14 @@ export const SalesChart: React.FC<SalesChartProps> = ({ orders, isLoading }) => 
               tick={{ fill: 'rgb(100 116 139)', fontSize: 12 }} 
               tickLine={false} 
               axisLine={false} 
-              tickFormatter={(value: number) => `$${(value / 1000).toFixed(0)}k`} 
+              tickFormatter={(value: number) => `${currency === 'EUR' ? '€' : '$'}${(value / 1000).toFixed(0)}k`} 
             />
             <Tooltip 
-              content={<CustomTooltip />} 
+              content={<CustomTooltip language={language} />} 
               cursor={{ fill: 'rgba(100, 116, 139, 0.1)' }} 
             />
             <Legend wrapperStyle={{ fontSize: '14px' }} />
-            <Bar dataKey="销售额" fill="rgb(99 102 241)" radius={[4, 4, 0, 0]} />
+            <Bar dataKey={t.sales} fill="rgb(99 102 241)" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

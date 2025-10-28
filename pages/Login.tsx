@@ -1,15 +1,20 @@
 import React, { useState, FormEvent } from 'react';
 import { ArchiveBoxIcon } from '../components/icons/ArchiveBoxIcon';
+import { translations, Language } from '../translations';
 
 interface LoginProps {
   onLogin: (success: boolean) => void;
+  language: Language;
+  setLanguage: (lang: Language) => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login: React.FC<LoginProps> = ({ onLogin, language, setLanguage }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const t = translations[language].login;
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -21,7 +26,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       if (username === 'admin' && password === 'password') {
         onLogin(true);
       } else {
-        setError('Invalid username or password.');
+        setError(t.errorMessage);
         onLogin(false);
       }
       setIsLoading(false);
@@ -36,7 +41,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <ArchiveBoxIcon className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">WMS Pro</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Sign in to continue to your dashboard.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t.subtitle}</p>
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 sm:p-8">
@@ -46,7 +51,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 htmlFor="username" 
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
               >
-                Username
+                {t.usernameLabel}
               </label>
               <input
                 id="username"
@@ -65,7 +70,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 htmlFor="password" 
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
               >
-                Password
+                {t.passwordLabel}
               </label>
               <input
                 id="password"
@@ -77,6 +82,44 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="password"
               />
+            </div>
+
+            <div className="flex justify-center">
+                <div className="flex items-center space-x-1 rounded-lg bg-slate-100 dark:bg-slate-700 p-1">
+                    <button
+                        type="button"
+                        onClick={() => setLanguage('en')}
+                        className={`flex-1 rounded-md px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
+                            language === 'en'
+                            ? 'bg-white text-indigo-600 shadow-sm dark:bg-slate-900'
+                            : 'text-slate-600 hover:bg-white/60 dark:text-slate-300 dark:hover:bg-slate-900/60'
+                        }`}
+                        >
+                        English
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setLanguage('zh')}
+                        className={`flex-1 rounded-md px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
+                            language === 'zh'
+                            ? 'bg-white text-indigo-600 shadow-sm dark:bg-slate-900'
+                            : 'text-slate-600 hover:bg-white/60 dark:text-slate-300 dark:hover:bg-slate-900/60'
+                        }`}
+                        >
+                        中文
+                    </button>
+                     <button
+                        type="button"
+                        onClick={() => setLanguage('fr')}
+                        className={`flex-1 rounded-md px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
+                            language === 'fr'
+                            ? 'bg-white text-indigo-600 shadow-sm dark:bg-slate-900'
+                            : 'text-slate-600 hover:bg-white/60 dark:text-slate-300 dark:hover:bg-slate-900/60'
+                        }`}
+                        >
+                        Français
+                    </button>
+                </div>
             </div>
 
             {error && (
@@ -96,7 +139,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                 ) : (
-                  'Sign In'
+                  t.signInButton
                 )}
               </button>
             </div>

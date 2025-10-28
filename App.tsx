@@ -6,9 +6,11 @@ import Outbound from './pages/Outbound';
 import Inventory from './pages/Inventory';
 import Settings from './pages/Settings';
 import Adjustment from './pages/Adjustment';
+import QboSync from './pages/QboSync';
 import Login from './pages/Login';
+import { Language } from './translations';
 
-export type View = 'dashboard' | 'inbound' | 'outbound' | 'inventory' | 'adjustment' | 'settings';
+export type View = 'dashboard' | 'inbound' | 'outbound' | 'inventory' | 'adjustment' | 'settings' | 'qbo-sync';
 export type Theme = 'light' | 'dark' | 'system';
 
 export interface AppError {
@@ -20,6 +22,7 @@ export interface AppError {
 const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>('dashboard');
   const [theme, setTheme] = useState<Theme>('system');
+  const [language, setLanguage] = useState<Language>('en');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     // Check session storage on initial load to maintain login state across refreshes
     return sessionStorage.getItem('wms-is-authenticated') === 'true';
@@ -30,11 +33,16 @@ const App: React.FC = () => {
     if (savedTheme) {
       setTheme(savedTheme);
     }
+    
+    const savedLanguage = localStorage.getItem('wms-language') as Language | null;
+    if (savedLanguage) {
+      setLanguage(savedLanguage);
+    }
 
     const params = new URLSearchParams(window.location.search);
     const view = params.get('view') as View;
     
-    if (view && ['dashboard', 'inbound', 'outbound', 'inventory', 'adjustment', 'settings'].includes(view)) {
+    if (view && ['dashboard', 'inbound', 'outbound', 'inventory', 'adjustment', 'settings', 'qbo-sync'].includes(view)) {
       setActiveView(view);
     }
     
@@ -59,6 +67,11 @@ const App: React.FC = () => {
     localStorage.setItem('wms-theme', theme);
   }, [theme]);
 
+  useEffect(() => {
+    localStorage.setItem('wms-language', language);
+  }, [language]);
+
+
   const handleLogin = (success: boolean) => {
     if (success) {
       // Persist authentication state in session storage
@@ -77,24 +90,26 @@ const App: React.FC = () => {
   const renderView = () => {
     switch (activeView) {
       case 'dashboard':
-        return <Dashboard />;
+        return <Dashboard language={language} />;
       case 'inbound':
         return <Inbound />;
       case 'outbound':
-        return <Outbound />;
+        return <Outbound language={language} />;
       case 'inventory':
         return <Inventory />;
+      case 'qbo-sync':
+        return <QboSync language={language} />;
       case 'adjustment':
-        return <Adjustment />;
+        return <Adjustment language={language} />;
       case 'settings':
         return <Settings theme={theme} setTheme={setTheme} onLogout={handleLogout} />;
       default:
-        return <Dashboard />;
+        return <Dashboard language={language} />;
     }
   };
 
   if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
+    return <Login onLogin={handleLogin} language={language} setLanguage={setLanguage} />;
   }
 
   return (

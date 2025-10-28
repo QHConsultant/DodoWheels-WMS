@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { fetchInventory } from '../services/inventoryService';
+import { fetchInventory, updateInventoryStock } from '../services/inventoryService';
 import { InventoryItem } from '../types';
 import { ArchiveBoxIcon } from '../components/icons/ArchiveBoxIcon';
 import { AdjustStockModal } from '../components/AdjustStockModal';
@@ -37,12 +37,17 @@ const Inventory: React.FC = () => {
       item.sku.toLowerCase().includes(searchTerm.toLowerCase())
     ), [inventory, searchTerm]);
   
-  const handleStockUpdate = (sku: string, newTotalQuantity: number) => {
-    // This is a local update to simulate adjusting stock.
-    setInventory(prev => prev.map(item => 
-      item.sku === sku ? { ...item, totalQuantity: newTotalQuantity } : item
-    ));
-    setItemToAdjust(null);
+  const handleStockUpdate = async (sku: string, newTotalQuantity: number) => {
+    try {
+        await updateInventoryStock(sku, newTotalQuantity);
+        setInventory(prev => prev.map(item => 
+          item.sku === sku ? { ...item, totalQuantity: newTotalQuantity } : item
+        ));
+        setItemToAdjust(null);
+    } catch (err) {
+        console.error("Failed to update stock:", err);
+        // Optionally show error to user
+    }
   };
   
   const renderContent = () => {

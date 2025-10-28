@@ -1,43 +1,29 @@
-import { DocType, AdjustmentLineItem, AdjustmentStatus } from '../types';
+import { AdjustmentLineItem } from '../types';
+import { MOCK_ADJUSTMENTS } from '../constants';
 
-interface RawAdjustmentItem {
-    id: string;
-    docType: DocType;
-    docNumber: string;
-    sku: string;
-    description: string;
-    fullDescription?: string;
-    qty: number;
-    locations: string[];
-}
+// Create a mutable copy for in-session persistence
+let sessionAdjustments: AdjustmentLineItem[] = JSON.parse(JSON.stringify(MOCK_ADJUSTMENTS));
 
-export const fetchAdjustmentData = async (docType: DocType): Promise<AdjustmentLineItem[]> => {
-    console.log(`Fetching adjustment data for ${docType} from server...`);
-    try {
-        const response = await fetch(`/api/adjustment-docs?docType=${encodeURIComponent(docType)}`);
 
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: 'Failed to fetch data from the server.' }));
-            if (response.status === 401 || response.status === 503) {
-                // 401 is for expired tokens, 503 can be for uninitialized client
-                throw new Error('QuickBooks Online connection required. Please connect from the Outbound page.');
-            }
-            throw new Error(errorData.message || `Server responded with status ${response.status}`);
-        }
+export const fetchAdjustments = async (): Promise<AdjustmentLineItem[]> => {
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  // Return the session's copy of the data
+  return Promise.resolve(sessionAdjustments);
+};
 
-        const rawItems: RawAdjustmentItem[] = await response.json();
-
-        const processedItems: AdjustmentLineItem[] = rawItems.map(item => ({
-            ...item,
-            selectedLocation: item.locations[0] || undefined,
-            status: AdjustmentStatus.Unconfirmed,
-        }));
-        
-        console.log(`Successfully fetched and processed adjustment data for ${docType}.`);
-        return processedItems;
-
-    } catch (error: any) {
-        console.error(`Error fetching adjustment data for ${docType}:`, error);
-        throw error;
+export const updateAdjustment = async (item: AdjustmentLineItem): Promise<AdjustmentLineItem> => {
+    // Simulate a successful API call and update the in-memory store
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    const itemIndex = sessionAdjustments.findIndex((adj: AdjustmentLineItem) => adj.id === item.id);
+    
+    if (itemIndex !== -1) {
+        sessionAdjustments[itemIndex] = item;
+    } else {
+        // This case shouldn't happen in the current flow, but is good practice
+        sessionAdjustments.push(item);
     }
+
+    return Promise.resolve(item);
 };

@@ -1,10 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Order, OrderStatus } from '../types';
-import { fetchOrders } from '../services/qboService';
+import { fetchOrders, updateOrderStatus } from '../services/qboService';
 import { ArrowUpOnSquareIcon } from '../components/icons/ArrowUpOnSquareIcon';
 import { OrderDetailsModal } from '../components/OrderDetailsModal';
 import { OrderStatusBadge } from '../components/OrderStatusBadge';
 import { RefreshIcon } from '../components/icons/RefreshIcon';
+import { Language } from '../translations';
+
+interface OutboundProps {
+    language: Language;
+}
 
 const KanbanCard: React.FC<{ order: Order; onClick: () => void }> = ({ order, onClick }) => (
   <div
@@ -80,7 +85,7 @@ const KanbanSkeleton: React.FC = () => (
   </>
 );
 
-const Outbound: React.FC = () => {
+const Outbound: React.FC<OutboundProps> = ({ language }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,8 +111,19 @@ const Outbound: React.FC = () => {
   }, [loadOrders]);
 
 
-  const handleStatusUpdate = (orderId: string, newStatus: OrderStatus) => {
+  const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
+    // Optimistic UI update
+    const originalOrders = orders;
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+
+    try {
+        await updateOrderStatus(orderId, newStatus);
+    } catch (err) {
+        console.error("Failed to update order status:", err);
+        // Revert UI on error
+        setOrders(originalOrders);
+        // Optionally show an error toast
+    }
   };
   
   const handleDrop = (newStatus: OrderStatus, orderId: string) => {
@@ -185,11 +201,12 @@ const Outbound: React.FC = () => {
         <OrderDetailsModal
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
-          onUpdateStatus={(orderId, newStatus) => {
-            handleStatusUpdate(orderId, newStatus);
+          onUpdateStatus={async (orderId, newStatus) => {
+            await handleStatusUpdate(orderId, newStatus);
             setSelectedOrder(prev => prev ? {...prev, status: newStatus} : null);
-            setTimeout(() => setSelectedOrder(null), 500);
+            setTimeout(() => setSelectedOrder(null), 300);
           }}
+          language={language}
         />
       )}
     </>

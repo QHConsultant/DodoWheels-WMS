@@ -2,12 +2,22 @@ import React, { useEffect } from 'react';
 import { Order, OrderStatus, InventoryStatus } from '../types';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { XIcon } from './icons/XIcon';
+import { Language } from '../translations';
 
 interface OrderDetailsModalProps {
   order: Order;
   onClose: () => void;
   onUpdateStatus: (orderId: string, newStatus: OrderStatus) => void;
+  language: Language;
 }
+
+const getLocaleConfig = (lang: Language) => {
+    switch (lang) {
+        case 'zh': return { locale: 'zh-CN', currency: 'CNY' };
+        case 'fr': return { locale: 'fr-FR', currency: 'EUR' };
+        default: return { locale: 'en-US', currency: 'USD' };
+    }
+};
 
 const StockStatusIndicator: React.FC<{ status: InventoryStatus }> = ({ status }) => (
   <div className="flex items-center">
@@ -16,7 +26,7 @@ const StockStatusIndicator: React.FC<{ status: InventoryStatus }> = ({ status })
   </div>
 );
 
-export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose, onUpdateStatus }) => {
+export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onClose, onUpdateStatus, language }) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -29,6 +39,8 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
     };
   }, [onClose]);
   
+  const { locale, currency } = getLocaleConfig(language);
+
   const canStartPicking = order.status === OrderStatus.Pending;
   const canFulfill = order.status === OrderStatus.Picking;
 
@@ -66,11 +78,11 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
             </div>
             <div>
               <p className="text-slate-500 dark:text-slate-400">Order Date</p>
-              <p className="font-semibold text-slate-800 dark:text-slate-200">{new Date(order.orderDate).toLocaleDateString()}</p>
+              <p className="font-semibold text-slate-800 dark:text-slate-200">{new Date(order.orderDate).toLocaleDateString(locale)}</p>
             </div>
             <div>
               <p className="text-slate-500 dark:text-slate-400">Total Amount</p>
-              <p className="font-semibold text-slate-800 dark:text-slate-200">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(order.totalAmount)}</p>
+              <p className="font-semibold text-slate-800 dark:text-slate-200">{new Intl.NumberFormat(locale, { style: 'currency', currency: currency }).format(order.totalAmount)}</p>
             </div>
             <div>
               <p className="text-slate-500 dark:text-slate-400">Status</p>

@@ -6,6 +6,7 @@ import { ArrowUpOnSquareIcon } from './icons/ArrowUpOnSquareIcon';
 import { ArchiveBoxIcon } from './icons/ArchiveBoxIcon';
 import { Cog6ToothIcon } from './icons/Cog6ToothIcon';
 import { SwitchHorizontalIcon } from './icons/SwitchHorizontalIcon';
+import { DocumentPlusIcon } from './icons/DocumentPlusIcon';
 
 interface DockProps {
   activeView: View;
@@ -17,6 +18,7 @@ const dockItems = [
   { id: 'inbound', label: 'Inbound', icon: InboxArrowDownIcon },
   { id: 'outbound', label: 'Outbound', icon: ArrowUpOnSquareIcon },
   { id: 'inventory', label: 'Inventory', icon: ArchiveBoxIcon },
+  { id: 'qbo-sync', label: 'QBO Data Sync', icon: DocumentPlusIcon },
   { id: 'adjustment', label: 'Adjustment', icon: SwitchHorizontalIcon },
   { id: 'settings', label: 'Settings', icon: Cog6ToothIcon },
 ];
