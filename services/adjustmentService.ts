@@ -1,29 +1,30 @@
 import { AdjustmentLineItem } from '../types';
-import { MOCK_ADJUSTMENTS } from '../constants';
-
-// Create a mutable copy for in-session persistence
-let sessionAdjustments: AdjustmentLineItem[] = JSON.parse(JSON.stringify(MOCK_ADJUSTMENTS));
-
 
 export const fetchAdjustments = async (): Promise<AdjustmentLineItem[]> => {
-  // Simulate network delay
+  // Simulate network delay to be consistent with other services
   await new Promise(resolve => setTimeout(resolve, 500));
-  // Return the session's copy of the data
-  return Promise.resolve(sessionAdjustments);
+  const response = await fetch('/api/adjustments');
+  if (!response.ok) {
+    throw new Error('Failed to fetch adjustments from API');
+  }
+  return await response.json();
 };
 
 export const updateAdjustment = async (item: AdjustmentLineItem): Promise<AdjustmentLineItem> => {
-    // Simulate a successful API call and update the in-memory store
+    // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 300));
     
-    const itemIndex = sessionAdjustments.findIndex((adj: AdjustmentLineItem) => adj.id === item.id);
-    
-    if (itemIndex !== -1) {
-        sessionAdjustments[itemIndex] = item;
-    } else {
-        // This case shouldn't happen in the current flow, but is good practice
-        sessionAdjustments.push(item);
+    const response = await fetch(`/api/adjustments/${item.id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(item),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to update adjustment via API');
     }
 
-    return Promise.resolve(item);
+    return await response.json();
 };

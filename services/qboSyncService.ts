@@ -1,8 +1,9 @@
 
+
 import { DocType, QboSyncItem } from '../types';
 
-// The local address of the Python agent
-const AGENT_BASE_URL = 'http://127.0.0.1:8008';
+// The local agent is proxied through our own backend to avoid CORS issues.
+const AGENT_BASE_URL = '/api/agent';
 
 export interface AgentStatus {
     running: boolean;
@@ -11,7 +12,7 @@ export interface AgentStatus {
 }
 
 /**
- * Sends a command to the LOCAL Python Selenium agent.
+ * Sends a command to the LOCAL Python Selenium agent via the backend proxy.
  * @param command The command to execute ('open', 'start_fetch', 'status', 'reset').
  * @param options Additional options, like the docType for 'start_fetch'.
  * @returns The current status from the agent.
@@ -33,15 +34,15 @@ export const controlQboScraper = async (
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ detail: 'Failed to communicate with the local agent.' }));
-            throw new Error(errorData.detail || `Agent responded with status ${response.status}`);
+            const errorData = await response.json().catch(() => ({ detail: 'Failed to communicate with the local agent proxy.' }));
+            throw new Error(errorData.detail || `Proxy responded with status ${response.status}`);
         }
 
         return await response.json();
     } catch (error: any) {
-        console.error(`Error sending command '${command}' to local agent:`, error);
-        // This catch block is crucial for detecting if the agent is offline.
-        throw new Error('Local agent is unreachable. Please ensure agent.py is running.');
+        console.error(`Error sending command '${command}' to local agent via proxy:`, error);
+        // This catch block handles network errors (proxy down) or errors thrown from the response check.
+        throw new Error('Local agent is unreachable via proxy. Please ensure agent.py is running and the backend server is running correctly.');
     }
 };
 

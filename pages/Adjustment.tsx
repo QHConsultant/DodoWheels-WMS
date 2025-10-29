@@ -71,6 +71,7 @@ const Adjustment: React.FC<AdjustmentProps> = ({ language }) => {
               <thead className="bg-slate-50 dark:bg-slate-700/50">
                 <tr>
                   <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.tableHeaders.docNumber}</th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.tableHeaders.docType}</th>
                   <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden sm:table-cell">{t.tableHeaders.sku}</th>
                   <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden md:table-cell">{t.tableHeaders.description}</th>
                   <th scope="col" className="px-3 sm:px-6 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.tableHeaders.qty}</th>
@@ -84,6 +85,7 @@ const Adjustment: React.FC<AdjustmentProps> = ({ language }) => {
                   [...Array(5)].map((_, i) => (
                     <tr key={i} className="animate-pulse">
                       <td className="px-3 sm:px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-24"></div></td>
+                      <td className="px-3 sm:px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20"></div></td>
                       <td className="px-3 sm:px-6 py-4 hidden sm:table-cell"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20"></div></td>
                       <td className="px-3 sm:px-6 py-4 hidden md:table-cell"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-48"></div></td>
                       <td className="px-3 sm:px-6 py-4 text-center"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-8 mx-auto"></div></td>
@@ -103,7 +105,7 @@ const Adjustment: React.FC<AdjustmentProps> = ({ language }) => {
                     ))
                 ) : (
                     <tr>
-                        <td colSpan={7} className="text-center py-12 px-6">
+                        <td colSpan={8} className="text-center py-12 px-6">
                             <p className="text-slate-500 dark:text-slate-400">{t.noAdjustments}</p>
                         </td>
                     </tr>

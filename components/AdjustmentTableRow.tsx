@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AdjustmentLineItem, AdjustmentStatus } from '../types';
 import { translations, Language } from '../translations';
+import { SearchableSelect } from './SearchableSelect';
 
 interface AdjustmentTableRowProps {
   item: AdjustmentLineItem;
@@ -71,20 +72,19 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
     return (
       <tr className="bg-slate-50 dark:bg-slate-700/50">
         <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800 dark:text-slate-200">{item.docNumber}</td>
+        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{item.docType}</td>
         <td className="px-3 sm:px-6 py-4 hidden sm:table-cell"><input type="text" value={editableItem.sku} onChange={e => setEditableItem({...editableItem, sku: e.target.value})} className="w-24 p-1 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md"/></td>
         <td className="px-3 sm:px-6 py-4 hidden md:table-cell"><input type="text" value={editableItem.description} onChange={e => setEditableItem({...editableItem, description: e.target.value})} className="w-48 p-1 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md"/></td>
         <td className="px-3 sm:px-6 py-4"><input type="number" value={editableItem.qty} onChange={e => setEditableItem({...editableItem, qty: parseInt(e.target.value) || 0})} className="w-16 p-1 text-sm text-center bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md"/></td>
         <td className="px-3 sm:px-6 py-4">
-            <select
-                value={editableItem.selectedLocation || ''}
-                onChange={(e) => setEditableItem({...editableItem, selectedLocation: e.target.value})}
-                className="w-32 p-1 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md"
-            >
-                <option value="" disabled>{t.selectLocation}</option>
-                {item.locations.map(loc => (<option key={loc} value={loc}>{loc}</option>))}
-          </select>
+            <SearchableSelect
+                options={item.locations}
+                value={editableItem.selectedLocation}
+                onChange={(newValue) => setEditableItem({ ...editableItem, selectedLocation: newValue })}
+                placeholder={t.selectLocation}
+            />
         </td>
-        <td className="px-3 sm:px-6 py-4"><StatusBadge status={item.status} t={t.status} /></td>
+        <td className="px-3 sm:px-6 py-4 text-center"><StatusBadge status={item.status} t={t.status} /></td>
         <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
             <button onClick={handleSave} disabled={isSaving} className="text-green-600 hover:text-green-800 disabled:opacity-50">{isSaving ? '...' : t.actions.save}</button>
             <button onClick={handleCancel} disabled={isSaving} className="text-slate-500 hover:text-slate-700 disabled:opacity-50">{t.actions.cancel}</button>
@@ -96,6 +96,7 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
   return (
     <tr className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
       <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800 dark:text-slate-200">{item.docNumber}</td>
+      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{item.docType}</td>
       <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-500 dark:text-slate-400 hidden sm:table-cell">{item.sku}</td>
       <td className="px-3 sm:px-6 py-4 text-sm text-slate-600 dark:text-slate-300 max-w-xs truncate hidden md:table-cell">{item.description}</td>
       <td className={`px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-center font-bold ${isNegativeFlow ? 'text-red-500' : 'text-green-500'}`}>

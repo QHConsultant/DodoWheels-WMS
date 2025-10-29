@@ -67,6 +67,7 @@ export const translations = {
         },
         tableHeaders: {
             docNumber: 'Document #',
+            docType: 'Doc Type',
             sku: 'SKU',
             description: 'Description',
             qty: 'Qty',
@@ -153,6 +154,7 @@ export const translations = {
         },
         tableHeaders: {
             docNumber: '单据号',
+            docType: '单据类型',
             sku: 'SKU',
             description: '描述',
             qty: '数量',
@@ -239,6 +241,7 @@ export const translations = {
         },
         tableHeaders: {
             docNumber: 'N° Document',
+            docType: 'Type Doc',
             sku: 'SKU',
             description: 'Description',
             qty: 'Qté',

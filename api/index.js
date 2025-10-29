@@ -3,6 +3,47 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('./supabaseClient');
 
+const AGENT_URL = 'http://127.0.0.1:8008';
+
+// --- Agent Proxy Endpoints ---
+// Proxies requests to the local Python agent to bypass browser CORS restrictions.
+// This will only work when the Node.js server is running on the same machine as the agent.
+
+router.get('/agent/status', async (req, res) => {
+    try {
+        const agentResponse = await fetch(`${AGENT_URL}/status`);
+        if (!agentResponse.ok) {
+            const errorText = await agentResponse.text();
+            throw new Error(`Agent returned status ${agentResponse.status}: ${errorText}`);
+        }
+        const data = await agentResponse.json();
+        res.status(agentResponse.status).json(data);
+    } catch (error) {
+        console.error('Agent status proxy error:', error.message);
+        res.status(500).json({ detail: 'Local agent is unreachable via proxy. Please ensure agent.py is running on http://127.0.0.1:8008.' });
+    }
+});
+
+router.post('/agent/control', async (req, res) => {
+    try {
+        const agentResponse = await fetch(`${AGENT_URL}/control`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(req.body),
+        });
+         if (!agentResponse.ok) {
+            const errorText = await agentResponse.text();
+            throw new Error(`Agent returned status ${agentResponse.status}: ${errorText}`);
+        }
+        const data = await agentResponse.json();
+        res.status(agentResponse.status).json(data);
+    } catch (error) {
+        console.error('Agent control proxy error:', error.message);
+        res.status(500).json({ detail: 'Local agent is unreachable via proxy. Please ensure agent.py is running on http://127.0.0.1:8008.' });
+    }
+});
+
+
 // NOTE: All Selenium simulation logic has been REMOVED from this file.
 // The new `agent.py` running on the user's local machine now handles all Selenium tasks.
 // This backend file is now just a standard API server for data operations.
