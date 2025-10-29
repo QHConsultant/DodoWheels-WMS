@@ -30,6 +30,7 @@ export const translations = {
     qboSync: {
         title: 'QBO Data Sync',
         openBrowserButton: 'Open Browser & Login to QBO',
+        browserOpenedAlert: 'Please login to QBO, then click a fetch button to start the process.',
         fetchButtons: {
             invoice: 'Fetch Invoices',
             saleReceipts: 'Fetch Sale Receipts',
@@ -114,6 +115,7 @@ export const translations = {
     qboSync: {
         title: 'QBO 数据同步',
         openBrowserButton: '打开浏览器并登录 QBO',
+        browserOpenedAlert: '请登录 QBO，然后点击抓取按钮开始操作。',
         fetchButtons: {
             invoice: '获取发票',
             saleReceipts: '获取销售收据',
@@ -198,6 +200,7 @@ export const translations = {
     qboSync: {
         title: 'Synchro Données QBO',
         openBrowserButton: 'Ouvrir Navigateur & Connexion QBO',
+        browserOpenedAlert: 'Veuillez vous connecter à QBO, puis cliquez sur un bouton de recherche pour démarrer.',
         fetchButtons: {
             invoice: 'Chercher Factures',
             saleReceipts: 'Chercher Reçus de Vente',

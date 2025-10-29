@@ -15,7 +15,7 @@ const Adjustment: React.FC<AdjustmentProps> = ({ language }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<AdjustmentStatus | 'All'>('Unconfirmed');
+  const [statusFilter, setStatusFilter] = useState<AdjustmentStatus | 'All'>(AdjustmentStatus.Unconfirmed);
 
   const t = translations[language].adjustment;
 

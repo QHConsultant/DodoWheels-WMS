@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { DocType } from '../types';
 import { controlQboScraper } from '../services/qboSyncService';
 import { DocumentPlusIcon } from '../components/icons/DocumentPlusIcon';
@@ -8,6 +8,20 @@ interface QboSyncProps {
     language: Language;
 }
 
+// Helper function to determine log color based on content
+const getLogColor = (log: string): string => {
+    if (log.includes('🔴') || log.toLowerCase().includes('error')) {
+        return 'text-red-400';
+    }
+    if (log.includes('✅') || log.includes('🎉')) {
+        return 'text-green-400';
+    }
+    if (log.includes('ℹ️') || log.includes('🌐') || log.includes('🚀') || log.includes('🔍') || log.includes('🔄')) {
+        return 'text-cyan-400';
+    }
+    return 'text-slate-300'; // Default color
+};
+
 const QboSync: React.FC<QboSyncProps> = ({ language }) => {
     const t = translations[language].qboSync;
     const logContainerRef = useRef<HTMLDivElement>(null);
@@ -15,7 +29,7 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
     const [isBrowserOpen, setIsBrowserOpen] = useState(false);
     const [isFetching, setIsFetching] = useState(false);
     const [logs, setLogs] = useState<string[]>([`[${new Date().toLocaleTimeString()}] ${t.logs.waiting}`]);
-    
+
     // Polling effect
     useEffect(() => {
         let intervalId: number;
@@ -26,6 +40,7 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
                     setLogs(status.logs);
                     if (!status.running) {
                         setIsFetching(false);
+                        // Data is no longer displayed on this page, so no need to refresh it.
                     }
                 } catch (error) {
                     console.error("Polling failed:", error);
@@ -35,7 +50,7 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
             }, 2000);
         }
         return () => clearInterval(intervalId);
-    }, [isFetching]);
+    }, [isFetching, t.logs.waiting]);
 
     // Auto-scroll logs
     useEffect(() => {
@@ -45,9 +60,22 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
     }, [logs]);
 
     const handleOpenBrowser = async () => {
-        const response = await controlQboScraper('open');
-        setLogs(response.logs);
-        setIsBrowserOpen(response.browserOpen);
+        // Open the QBO page in a new tab to simulate the browser action
+        window.open('https://qbo.intuit.com/app/sales', '_blank');
+
+        try {
+            // Then, update the backend's simulated state
+            const response = await controlQboScraper('open');
+            setLogs(response.logs);
+            setIsBrowserOpen(response.browserOpen);
+            if (response.browserOpen) {
+                alert(t.browserOpenedAlert);
+            }
+        } catch (error) {
+            console.error("Scraper 'open' command failed:", error);
+            setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] 🔴 Backend error: ${(error as Error).message}`]);
+            setIsBrowserOpen(false); // Ensure UI reflects the failure
+        }
     };
 
     const handleStartFetch = async (docType: DocType) => {
@@ -68,7 +96,9 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;
-            a.download = response.headers.get('Content-Disposition')?.split('filename=')[1] || 'export.csv';
+            const contentDisposition = response.headers.get('Content-Disposition');
+            const filename = contentDisposition ? contentDisposition.split('filename=')[1].replace(/"/g, '') : 'export.csv';
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -76,6 +106,22 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
         } catch (error) {
             console.error('Export failed:', error);
             alert(`Export failed: ${error}`);
+        }
+    };
+
+    const handleReset = async () => {
+        if (window.confirm("Are you sure you want to reset the scraper? This will clear all fetched data and close the 'browser' session.")) {
+            setIsFetching(true); // Reuse isFetching to show a loading state on all buttons
+            try {
+                const response = await controlQboScraper('reset');
+                setLogs(response.logs);
+                setIsBrowserOpen(response.browserOpen);
+                setIsFetching(response.running);
+            } catch (error) {
+                console.error("Reset failed:", error);
+                setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] 🔴 Reset Error: ${(error as Error).message}`]);
+                setIsFetching(false);
+            }
         }
     };
 
@@ -94,41 +140,46 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
         </header>
         
         <main className="container mx-auto p-4 sm:p-6 lg:p-8">
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 mb-8">
-                <div className="flex flex-wrap items-center gap-4">
-                    <button onClick={handleOpenBrowser} disabled={isFetching || isBrowserOpen} className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed">
-                        {t.openBrowserButton}
-                    </button>
-                    <button onClick={() => handleStartFetch('Invoice')} disabled={!isBrowserOpen || isFetching} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-200 rounded-md hover:bg-slate-300 disabled:opacity-50 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
-                        {isFetching ? '...' : t.fetchButtons.invoice}
-                    </button>
-                     <button onClick={() => handleStartFetch('Sale Receipts')} disabled={!isBrowserOpen || isFetching} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-200 rounded-md hover:bg-slate-300 disabled:opacity-50 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
-                        {isFetching ? '...' : t.fetchButtons.saleReceipts}
-                    </button>
-                     <button onClick={() => handleStartFetch('Credit Memo')} disabled={!isBrowserOpen || isFetching} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-200 rounded-md hover:bg-slate-300 disabled:opacity-50 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
-                        {isFetching ? '...' : t.fetchButtons.creditMemo}
-                    </button>
-                     <button onClick={() => handleStartFetch('Estimate')} disabled={!isBrowserOpen || isFetching} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-200 rounded-md hover:bg-slate-300 disabled:opacity-50 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
-                        {isFetching ? '...' : t.fetchButtons.estimates}
-                    </button>
-                    <button onClick={handleExport} disabled={isFetching} className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed">
-                        {t.exportButton}
-                    </button>
+            <div className="space-y-8">
+                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
+                    <div className="flex flex-wrap items-center gap-4">
+                        <button onClick={handleOpenBrowser} disabled={isFetching || isBrowserOpen} className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed">
+                            {t.openBrowserButton}
+                        </button>
+                        <button onClick={() => handleStartFetch('Invoice')} disabled={!isBrowserOpen || isFetching} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-200 rounded-md hover:bg-slate-300 disabled:opacity-50 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
+                            {isFetching ? '...' : t.fetchButtons.invoice}
+                        </button>
+                        <button onClick={() => handleStartFetch('Sale Receipts')} disabled={!isBrowserOpen || isFetching} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-200 rounded-md hover:bg-slate-300 disabled:opacity-50 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
+                            {isFetching ? '...' : t.fetchButtons.saleReceipts}
+                        </button>
+                        <button onClick={() => handleStartFetch('Credit Memo')} disabled={!isBrowserOpen || isFetching} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-200 rounded-md hover:bg-slate-300 disabled:opacity-50 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
+                            {isFetching ? '...' : t.fetchButtons.creditMemo}
+                        </button>
+                        <button onClick={() => handleStartFetch('Estimate')} disabled={!isBrowserOpen || isFetching} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-200 rounded-md hover:bg-slate-300 disabled:opacity-50 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
+                            {isFetching ? '...' : t.fetchButtons.estimates}
+                        </button>
+                        <button onClick={handleExport} disabled={isFetching} className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed">
+                            {t.exportButton}
+                        </button>
+                        <button onClick={handleReset} disabled={isFetching} className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed">
+                            Reset Scraper
+                        </button>
+                    </div>
                 </div>
-            </div>
-            
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
-                <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">{t.fetchLogsTitle}</h4>
-                <div ref={logContainerRef} className="bg-slate-900 text-slate-300 font-mono text-sm rounded-lg p-4 h-96 overflow-y-auto">
-                    {logs.map((log, index) => (
-                        <p key={index} className="whitespace-pre-wrap leading-relaxed">{log}</p>
-                    ))}
-                     {isFetching && (
-                        <div className="flex items-center">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-slate-400 mr-3"></div>
-                            <span>Processing...</span>
-                        </div>
-                    )}
+                
+                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
+                    <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">{t.fetchLogsTitle}</h4>
+                    <div ref={logContainerRef} className="bg-slate-900 font-mono text-sm rounded-lg p-4 h-64 overflow-y-auto">
+                        {logs.map((log, index) => (
+                            <p key={index} className={`whitespace-pre-wrap leading-relaxed ${getLogColor(log)}`}>{log}</p>
+                        ))}
+                        {isFetching && (
+                            <div className="flex items-center text-slate-400">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-slate-400 mr-3"></div>
+                                <span>Processing...</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </main>

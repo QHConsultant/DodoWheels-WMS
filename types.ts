@@ -19,8 +19,8 @@ export enum InventoryStatus {
 }
 
 export enum AdjustmentStatus {
-  Confirmed = '已确认',
-  Unconfirmed = '未确认',
+  Confirmed = 'Confirmed',
+  Unconfirmed = 'Unconfirmed',
 }
 
 export type DocType = 'Invoice' | 'Sale Receipts' | 'Credit Memo' | 'Estimate';

@@ -8,14 +8,15 @@ interface AdjustmentTableRowProps {
   language: Language;
 }
 
-const StatusBadge: React.FC<{ status: AdjustmentStatus }> = ({ status }) => {
+const StatusBadge: React.FC<{ status: AdjustmentStatus; t: typeof translations['en']['adjustment']['status'] }> = ({ status, t }) => {
   const styles = {
     [AdjustmentStatus.Confirmed]: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
     [AdjustmentStatus.Unconfirmed]: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
   };
+  const statusText = status === AdjustmentStatus.Confirmed ? t.confirmed : t.unconfirmed;
   return (
     <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${styles[status]}`}>
-      {status}
+      {statusText}
     </span>
   );
 };
@@ -82,7 +83,7 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
                 {item.locations.map(loc => (<option key={loc} value={loc}>{loc}</option>))}
           </select>
         </td>
-        <td className="px-6 py-4"><StatusBadge status={item.status} /></td>
+        <td className="px-6 py-4"><StatusBadge status={item.status} t={t.status} /></td>
         <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
             <button onClick={handleSave} disabled={isSaving} className="text-green-600 hover:text-green-800 disabled:opacity-50">{isSaving ? '...' : t.actions.save}</button>
             <button onClick={handleCancel} disabled={isSaving} className="text-slate-500 hover:text-slate-700 disabled:opacity-50">{t.actions.cancel}</button>
@@ -100,7 +101,7 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
         {item.qty}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-mono">{item.selectedLocation || 'N/A'}</td>
-      <td className="px-6 py-4 text-center"><StatusBadge status={item.status} /></td>
+      <td className="px-6 py-4 text-center"><StatusBadge status={item.status} t={t.status} /></td>
       <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
         {!isLocked && <button onClick={() => setIsEditing(true)} disabled={isSaving} className="text-indigo-600 hover:text-indigo-800 disabled:opacity-50">{t.actions.edit}</button>}
         {isLocked ? (

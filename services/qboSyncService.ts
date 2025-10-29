@@ -1,4 +1,4 @@
-import { DocType } from '../types';
+import { DocType, QboSyncItem } from '../types';
 
 interface ScraperStatus {
     running: boolean;
@@ -33,6 +33,20 @@ export const controlQboScraper = async (
         return await response.json();
     } catch (error: any) {
         console.error(`Error sending command '${command}' to scraper:`, error);
+        throw error;
+    }
+};
+
+export const fetchSyncedData = async (): Promise<QboSyncItem[]> => {
+    try {
+        const response = await fetch('/api/synced_data');
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Failed to fetch synced data');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching synced data:', error);
         throw error;
     }
 };
