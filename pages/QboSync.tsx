@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useRef } from 'react';
 import { DocType } from '../types';
 import { controlQboScraper } from '../services/qboSyncService';
@@ -102,7 +101,7 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
     return (
       <>
         <header className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
-          <div className="container mx_auto px-4 sm:px-6 lg:px-8">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center space-x-3">
                 <DocumentPlusIcon className="h-7 w-7 text-indigo-500" />
@@ -148,7 +147,7 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
                 
                 <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
                     <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">{t.fetchLogsTitle}</h4>
-                    <div ref={logContainerRef} className="bg-slate-900 font-mono text-sm rounded-lg p-4 h-64 overflow-y-auto">
+                    <div ref={logContainerRef} className="bg-slate-900 font-mono text-sm rounded-lg p-4 h-96 overflow-y-auto">
                         {logs.map((log, index) => (
                             <p key={index} className={`whitespace-pre-wrap leading-relaxed ${getLogColor(log)}`}>{log}</p>
                         ))}
