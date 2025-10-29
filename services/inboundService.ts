@@ -1,23 +1,22 @@
-import { PurchaseOrder } from '../types';
 import { MOCK_PURCHASE_ORDERS } from '../constants';
+import { PurchaseOrder } from '../types';
 
-// Create a mutable copy for in-session persistence
-let sessionPOs: PurchaseOrder[] = JSON.parse(JSON.stringify(MOCK_PURCHASE_ORDERS));
+let mockPurchaseOrdersDB = JSON.parse(JSON.stringify(MOCK_PURCHASE_ORDERS));
 
 export const fetchPurchaseOrders = async (): Promise<PurchaseOrder[]> => {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 500));
-  // Return mock data
-  return Promise.resolve(sessionPOs);
+  return Promise.resolve(JSON.parse(JSON.stringify(mockPurchaseOrdersDB)));
 };
 
 export const updatePurchaseOrder = async (po: PurchaseOrder): Promise<void> => {
-    // Simulate a successful API call and update in-memory data
+    // Simulate a successful API call
     await new Promise(resolve => setTimeout(resolve, 300));
-    const poIndex = sessionPOs.findIndex(p => p.id === po.id);
+    const poIndex = mockPurchaseOrdersDB.findIndex((p: PurchaseOrder) => p.id === po.id);
     if (poIndex !== -1) {
-        sessionPOs[poIndex] = po;
+        mockPurchaseOrdersDB[poIndex] = po;
+    } else {
+        throw new Error('Purchase Order not found');
     }
-    console.log('Simulating update for PO:', po);
     return Promise.resolve();
 };

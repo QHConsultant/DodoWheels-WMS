@@ -1,7 +1,9 @@
-
 const express = require('express');
 const router = express.Router();
 const supabase = require('./supabaseClient');
+const fetch = require('node-fetch');
+const cors = require('cors');
+
 
 const AGENT_URL = 'http://127.0.0.1:8008';
 
@@ -259,59 +261,87 @@ router.put('/inventory/:sku', async (req, res) => {
 
 // Fetch Adjustments (from qbo_synced_data)
 router.get('/adjustments', async (req, res) => {
-    const { data, error } = await supabase
-      .from('qbo_synced_data')
-      .select('*')
-      .order('created_at', { ascending: false });
+    console.log('[API] Received request for GET /adjustments');
+    try {
+      const { data, error } = await supabase
+        .from('qbo_synced_data')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (error) return res.status(500).json({ error: error.message });
-    
-    const formattedData = data.map(item => {
-        const rawDescription = item.description || '';
-        const descriptionParts = rawDescription.split('@');
-        const cleanDescription = descriptionParts[0].trim();
-        const locations = descriptionParts.length > 1 
-            ? descriptionParts[1].split(',').map(s => s.trim()).filter(Boolean) 
-            : [];
+      if (error) {
+        console.error('[API] Supabase error on GET /adjustments:', error);
+        throw error;
+      }
+      
+      console.log(`[API] Fetched ${data.length} records from Supabase for adjustments.`);
+      
+      const formattedData = data.map(item => {
+          const rawDescription = item.description || '';
+          const descriptionParts = rawDescription.split('@');
+          const cleanDescription = descriptionParts[0].trim();
+          const locations = descriptionParts.length > 1 
+              ? descriptionParts[1].split(',').map(s => s.trim()).filter(Boolean) 
+              : [];
+  
+          return {
+              id: item.id.toString(),
+              date: item.doc_date,
+              customer: item.customer,
+              productName: item.product,
+              docType: item.doc_type,
+              docNumber: item.doc_number,
+              sku: item.sku,
+              description: cleanDescription,
+              qty: Math.abs(item.qty),
+              locations: locations,
+              selectedLocation: item.selected_location || undefined,
+              status: item.status,
+          };
+      });
 
-        return {
-            id: item.id.toString(),
-            docType: item.doc_type,
-            docNumber: item.doc_number,
-            sku: item.sku,
-            description: cleanDescription,
-            qty: Math.abs(item.qty),
-            locations: locations,
-            selectedLocation: item.selected_location || '',
-            status: item.status,
-        };
-    });
-    res.json(formattedData);
+      console.log('[API] Sending formatted adjustment data to client.');
+      res.json(formattedData);
+    } catch (error) {
+        console.error('[API] Final catch block error fetching adjustments:', error.message);
+        res.status(500).json({ error: `Failed to fetch adjustments: ${error.message}` });
+    }
 });
 
 
 // Update/Lock/Unlock Adjustments
 router.put('/adjustments/:id', async (req, res) => {
     const { id } = req.params;
-    const { sku, description, qty, selectedLocation, status } = req.body;
+    console.log(`[API] Received request for PUT /adjustments/${id}`, { body: req.body });
+    try {
+        const { sku, description, qty, selectedLocation, status } = req.body;
 
-    const { data, error } = await supabase
-        .from('qbo_synced_data')
-        .update({ sku, description, qty, selected_location: selectedLocation, status })
-        .eq('id', id)
-        .select()
-        .single();
-    
-    if (error) return res.status(500).json({ error: error.message });
-    res.json(data);
+        const { data, error } = await supabase
+            .from('qbo_synced_data')
+            .update({ sku, description, qty, selected_location: selectedLocation, status })
+            .eq('id', id)
+            .select()
+            .single();
+        
+        if (error) {
+            console.error(`[API] Supabase error on PUT /adjustments/${id}:`, error);
+            throw error;
+        }
+        console.log(`[API] Successfully updated adjustment ${id}.`, { responseData: data });
+        res.json(data);
+    } catch (error) {
+        console.error(`[API] Final catch block error updating adjustment ${id}:`, error.message);
+        res.status(500).json({ error: `Failed to update adjustment: ${error.message}` });
+    }
 });
 
 
 const app = express();
 app.use(express.json());
-// Allow all CORS requests for simplicity in this architecture
-const cors = require('cors');
 app.use(cors());
+
+// The parent app (server.js for local dev, or Vercel's proxy) handles
+// stripping the '/api' prefix. This app now only needs to handle the
+// routes themselves.
 app.use(router);
 
 module.exports = app;

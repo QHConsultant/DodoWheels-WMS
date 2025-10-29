@@ -66,6 +66,9 @@ export const translations = {
             confirmed: 'Confirmed',
         },
         tableHeaders: {
+            date: 'Date',
+            customer: 'Customer',
+            product: 'Product',
             docNumber: 'Document #',
             docType: 'Doc Type',
             sku: 'SKU',
@@ -153,6 +156,9 @@ export const translations = {
             confirmed: '已确认',
         },
         tableHeaders: {
+            date: '日期',
+            customer: '客户',
+            product: '产品',
             docNumber: '单据号',
             docType: '单据类型',
             sku: 'SKU',
@@ -240,6 +246,9 @@ export const translations = {
             confirmed: 'Confirmé',
         },
         tableHeaders: {
+            date: 'Date',
+            customer: 'Client',
+            product: 'Produit',
             docNumber: 'N° Document',
             docType: 'Type Doc',
             sku: 'SKU',

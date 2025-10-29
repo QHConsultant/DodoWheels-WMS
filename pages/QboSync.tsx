@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { DocType } from '../types';
-import { controlQboScraper } from '../services/qboSyncService';
+import { DocType, QboSyncItem } from '../types';
+import { controlQboScraper, fetchSyncedData } from '../services/qboSyncService';
 import { DocumentPlusIcon } from '../components/icons/DocumentPlusIcon';
 import { Language, translations } from '../translations';
+import { RefreshIcon } from '../components/icons/RefreshIcon';
+import { ArrowDownTrayIcon } from '../components/icons/ArrowDownTrayIcon';
 
 interface QboSyncProps {
     language: Language;
@@ -16,6 +18,22 @@ const getLogColor = (log: string): string => {
     return 'text-slate-300';
 };
 
+const TableSkeleton: React.FC = () => (
+    <>
+      {[...Array(5)].map((_, i) => (
+        <tr key={i} className="animate-pulse">
+          <td className="px-3 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20"></div></td>
+          <td className="px-3 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-24"></div></td>
+          <td className="px-3 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20"></div></td>
+          <td className="px-3 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-32"></div></td>
+          <td className="px-3 py-4 hidden sm:table-cell"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-40"></div></td>
+          <td className="px-3 py-4 hidden md:table-cell"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-16"></div></td>
+          <td className="px-3 py-4 hidden lg:table-cell"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-48"></div></td>
+        </tr>
+      ))}
+    </>
+  );
+
 const QboSync: React.FC<QboSyncProps> = ({ language }) => {
     const t = translations[language].qboSync;
     const logContainerRef = useRef<HTMLDivElement>(null);
@@ -25,6 +43,10 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
     const [logs, setLogs] = useState<string[]>([`[${new Date().toLocaleTimeString()}] ${t.logs.waiting}`]);
     const [agentReachable, setAgentReachable] = useState(true);
 
+    const [syncedData, setSyncedData] = useState<QboSyncItem[]>([]);
+    const [isDataLoading, setIsDataLoading] = useState(true);
+    const [dataError, setDataError] = useState<string | null>(null);
+
     const pollStatus = useCallback(async (isInitialPoll = false) => {
         try {
             const status = await controlQboScraper('status');
@@ -32,22 +54,40 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
             setIsBrowserOpen(status.browserOpen);
             setAgentReachable(true); 
             
-            // If the agent was fetching but is now stopped, update our state
             if (isFetching && !status.running) {
                 setIsFetching(false);
-            } else if (!isFetching) { // Only update fetching status if not already controlled by a command
+                // When fetching stops, refresh the data table
+                loadSyncedData();
+            } else if (!isFetching) {
                  setIsFetching(status.running);
             }
 
         } catch (error) {
             console.error("Polling failed:", error);
             const errorMsg = `[${new Date().toLocaleTimeString()}] 🔴 Agent Unreachable: Please ensure the local agent.py script is running.`;
-            // Only add error if it's new
             setLogs(prev => prev[prev.length-1]?.includes('Unreachable') ? prev : [...prev, errorMsg]);
             setAgentReachable(false);
             setIsFetching(false);
         }
     }, [isFetching]);
+
+    const loadSyncedData = useCallback(async () => {
+        setIsDataLoading(true);
+        setDataError(null);
+        try {
+            const data = await fetchSyncedData();
+            setSyncedData(data);
+        } catch (err) {
+            setDataError((err as Error).message);
+        } finally {
+            setIsDataLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        loadSyncedData();
+    }, [loadSyncedData]);
+
 
     useEffect(() => {
         // Initial status check
@@ -140,6 +180,63 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
                         )}
                     </div>
                 </div>
+
+                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md">
+                    <div className="p-4 sm:p-6 flex justify-between items-center">
+                        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t.syncedDataTitle}</h2>
+                        <div className="flex items-center space-x-2">
+                             <a href="/api/export_csv" download
+                                className="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600/50"
+                            >
+                                <ArrowDownTrayIcon className="h-5 w-5" />
+                                <span className="hidden sm:inline">{t.exportButton}</span>
+                            </a>
+                            <button
+                                onClick={loadSyncedData}
+                                disabled={isDataLoading}
+                                className="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600/50 disabled:opacity-50"
+                            >
+                                <RefreshIcon className={`h-5 w-5 ${isDataLoading ? 'animate-spin' : ''}`} />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                            <thead className="bg-slate-50 dark:bg-slate-700/50">
+                                <tr>
+                                    <th className="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.tableHeaders.date}</th>
+                                    <th className="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.tableHeaders.type}</th>
+                                    <th className="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.tableHeaders.docNumber}</th>
+                                    <th className="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.tableHeaders.customer}</th>
+                                    <th className="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden sm:table-cell">{t.tableHeaders.product}</th>
+                                    <th className="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden md:table-cell">{t.tableHeaders.qty}</th>
+                                    <th className="px-3 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden lg:table-cell">{t.tableHeaders.description}</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700 text-sm">
+                                {isDataLoading && <TableSkeleton />}
+                                {!isDataLoading && dataError && (
+                                    <tr><td colSpan={7} className="text-center py-12 px-4 text-red-500">{dataError}</td></tr>
+                                )}
+                                {!isDataLoading && !dataError && syncedData.length === 0 && (
+                                    <tr><td colSpan={7} className="text-center py-12 px-4 text-slate-500">{t.noItems}</td></tr>
+                                )}
+                                {!isDataLoading && !dataError && syncedData.map((item) => (
+                                    <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                                        <td className="px-3 py-4 whitespace-nowrap text-slate-500 dark:text-slate-400">{item.date}</td>
+                                        <td className="px-3 py-4 whitespace-nowrap text-slate-500 dark:text-slate-400">{item.type}</td>
+                                        <td className="px-3 py-4 whitespace-nowrap font-medium text-slate-800 dark:text-slate-200">{item.docNumber}</td>
+                                        <td className="px-3 py-4 whitespace-nowrap text-slate-800 dark:text-slate-200">{item.customer}</td>
+                                        <td className="px-3 py-4 whitespace-nowrap hidden sm:table-cell">{item.product}</td>
+                                        <td className="px-3 py-4 whitespace-nowrap text-center font-bold hidden md:table-cell">{item.qty}</td>
+                                        <td className="px-3 py-4 whitespace-nowrap text-slate-500 dark:text-slate-400 max-w-xs truncate hidden lg:table-cell">{item.description}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </main>
       </>

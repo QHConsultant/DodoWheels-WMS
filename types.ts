@@ -73,6 +73,9 @@ export interface InventoryItem {
 
 export interface AdjustmentLineItem {
   id: string; // Unique ID for the line item
+  date: string;
+  customer: string;
+  productName: string;
   docType: DocType;
   docNumber: string;
   sku: string;

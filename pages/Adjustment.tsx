@@ -20,15 +20,19 @@ const Adjustment: React.FC<AdjustmentProps> = ({ language }) => {
   const t = translations[language].adjustment;
 
   const loadAdjustments = useCallback(async () => {
+    console.log('[Page] loadAdjustments: Initiating fetch.');
     setIsLoading(true);
     setError(null);
     try {
       const data = await fetchAdjustments();
+      console.log('[Page] loadAdjustments: Successfully fetched data.', { count: data.length });
       setAdjustments(data);
     } catch (err: any) {
+      console.error('[Page] loadAdjustments: An error occurred during fetch.', err);
       setError(err.message || 'Failed to fetch adjustments.');
     } finally {
       setIsLoading(false);
+      console.log('[Page] loadAdjustments: Fetch process finished.');
     }
   }, []);
 
@@ -37,12 +41,14 @@ const Adjustment: React.FC<AdjustmentProps> = ({ language }) => {
   }, [loadAdjustments]);
   
   const handleUpdate = async (updatedItem: AdjustmentLineItem) => {
+    console.log('[Page] handleUpdate: Attempting to update item.', { id: updatedItem.id });
     try {
-        await updateAdjustment(updatedItem);
-        setAdjustments(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+        const result = await updateAdjustment(updatedItem);
+        console.log('[Page] handleUpdate: Update successful. Updating local state.', { result });
+        setAdjustments(prev => prev.map(item => item.id === updatedItem.id ? result : item));
     } catch (err) {
-        console.error('Failed to update item:', err);
-        // Optionally show an error to the user
+        console.error('[Page] handleUpdate: Failed to update item.', { id: updatedItem.id, error: err });
+        alert(`Failed to update item: ${(err as Error).message}`);
     }
   };
 
@@ -55,6 +61,8 @@ const Adjustment: React.FC<AdjustmentProps> = ({ language }) => {
       .filter(item =>
         item.docNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
   }, [adjustments, searchTerm, statusFilter]);
@@ -70,10 +78,11 @@ const Adjustment: React.FC<AdjustmentProps> = ({ language }) => {
             <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
               <thead className="bg-slate-50 dark:bg-slate-700/50">
                 <tr>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden lg:table-cell">{t.tableHeaders.date}</th>
                   <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.tableHeaders.docNumber}</th>
-                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.tableHeaders.docType}</th>
-                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden sm:table-cell">{t.tableHeaders.sku}</th>
-                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden md:table-cell">{t.tableHeaders.description}</th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden sm:table-cell">{t.tableHeaders.customer}</th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.tableHeaders.sku}</th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden md:table-cell">{t.tableHeaders.product}</th>
                   <th scope="col" className="px-3 sm:px-6 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.tableHeaders.qty}</th>
                   <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.tableHeaders.locations}</th>
                   <th scope="col" className="px-3 sm:px-6 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">{t.tableHeaders.status}</th>
@@ -84,10 +93,11 @@ const Adjustment: React.FC<AdjustmentProps> = ({ language }) => {
                 {isLoading ? (
                   [...Array(5)].map((_, i) => (
                     <tr key={i} className="animate-pulse">
+                      <td className="px-3 sm:px-6 py-4 hidden lg:table-cell"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20"></div></td>
                       <td className="px-3 sm:px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-24"></div></td>
+                      <td className="px-3 sm:px-6 py-4 hidden sm:table-cell"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-28"></div></td>
                       <td className="px-3 sm:px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20"></div></td>
-                      <td className="px-3 sm:px-6 py-4 hidden sm:table-cell"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20"></div></td>
-                      <td className="px-3 sm:px-6 py-4 hidden md:table-cell"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-48"></div></td>
+                      <td className="px-3 sm:px-6 py-4 hidden md:table-cell"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-40"></div></td>
                       <td className="px-3 sm:px-6 py-4 text-center"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-8 mx-auto"></div></td>
                       <td className="px-3 sm:px-6 py-4"><div className="h-10 bg-slate-200 dark:bg-slate-700 rounded w-32"></div></td>
                       <td className="px-3 sm:px-6 py-4 text-center"><div className="h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-24 mx-auto"></div></td>
@@ -105,7 +115,7 @@ const Adjustment: React.FC<AdjustmentProps> = ({ language }) => {
                     ))
                 ) : (
                     <tr>
-                        <td colSpan={8} className="text-center py-12 px-6">
+                        <td colSpan={9} className="text-center py-12 px-6">
                             <p className="text-slate-500 dark:text-slate-400">{t.noAdjustments}</p>
                         </td>
                     </tr>

@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const apiRouter = require('./api'); // Assuming api/index.js is the router file
+const apiHandler = require('./api'); // This is the Express app from api/index.js
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -8,17 +8,19 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// API routes
-app.use('/api', apiRouter);
+// Mount the API handler at the '/api' route.
+// This is the standard pattern and mimics Vercel's rewrite behavior.
+// A request to '/api/adjustments' will be sent to apiHandler as '/adjustments'.
+app.use('/api', apiHandler);
 
 // Serve static files from the React app
-// Note: In a real production app, you might serve this from a different server (e.g., NGINX)
-app.use(express.static(path.join(__dirname, '../build')));
+// This must point to the 'dist' folder as defined in package.json build script
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../build/index.html'));
+  res.sendFile(path.join(__dirname, 'dist/index.html'));
 });
 
 app.listen(PORT, () => {

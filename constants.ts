@@ -119,6 +119,10 @@ const rawMockData = [
 
 export const MOCK_ADJUSTMENTS: AdjustmentLineItem[] = rawMockData.map((item, index) => ({
     id: String(index + 1),
+    // FIX: Added missing properties to match the AdjustmentLineItem type.
+    date: item.date,
+    customer: item.customer,
+    productName: item.product,
     docType: item.type,
     docNumber: item.docNumber,
     sku: item.sku,

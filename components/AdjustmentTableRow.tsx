@@ -56,13 +56,22 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
 
   const handleUnlock = async () => {
     const password = prompt(t.unlockPrompt);
-    if (password === 'password') { // Hardcoded password, same as backend
+    if (password === 'password') { // Hardcoded password
         setIsSaving(true);
         await onUpdate({ ...editableItem, status: AdjustmentStatus.Unconfirmed });
         setIsSaving(false);
     } else if (password !== null) {
         alert('Invalid password.');
     }
+  };
+  
+  const formatDate = (dateString: string) => {
+    const locale = language === 'zh' ? 'zh-CN' : language === 'fr' ? 'fr-FR' : 'en-US';
+    return new Date(dateString).toLocaleDateString(locale, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
   };
 
   const isLocked = item.status === AdjustmentStatus.Confirmed;
@@ -71,10 +80,14 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
   if (isEditing) {
     return (
       <tr className="bg-slate-50 dark:bg-slate-700/50">
+        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 hidden lg:table-cell">{formatDate(item.date)}</td>
         <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800 dark:text-slate-200">{item.docNumber}</td>
-        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{item.docType}</td>
-        <td className="px-3 sm:px-6 py-4 hidden sm:table-cell"><input type="text" value={editableItem.sku} onChange={e => setEditableItem({...editableItem, sku: e.target.value})} className="w-24 p-1 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md"/></td>
-        <td className="px-3 sm:px-6 py-4 hidden md:table-cell"><input type="text" value={editableItem.description} onChange={e => setEditableItem({...editableItem, description: e.target.value})} className="w-48 p-1 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md"/></td>
+        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300 hidden sm:table-cell">{item.customer}</td>
+        <td className="px-3 sm:px-6 py-4"><input type="text" value={editableItem.sku} onChange={e => setEditableItem({...editableItem, sku: e.target.value})} className="w-24 p-1 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md"/></td>
+        <td className="px-3 sm:px-6 py-4 max-w-xs hidden md:table-cell">
+            <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">{item.productName}</p>
+            <input type="text" value={editableItem.description} onChange={e => setEditableItem({...editableItem, description: e.target.value})} className="w-full p-1 mt-1 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md"/>
+        </td>
         <td className="px-3 sm:px-6 py-4"><input type="number" value={editableItem.qty} onChange={e => setEditableItem({...editableItem, qty: parseInt(e.target.value) || 0})} className="w-16 p-1 text-sm text-center bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md"/></td>
         <td className="px-3 sm:px-6 py-4">
             <SearchableSelect
@@ -95,12 +108,16 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
 
   return (
     <tr className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800 dark:text-slate-200">{item.docNumber}</td>
-      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{item.docType}</td>
-      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-500 dark:text-slate-400 hidden sm:table-cell">{item.sku}</td>
-      <td className="px-3 sm:px-6 py-4 text-sm text-slate-600 dark:text-slate-300 max-w-xs truncate hidden md:table-cell">{item.description}</td>
+      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 hidden lg:table-cell">{formatDate(item.date)}</td>
+      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600 dark:text-indigo-400">{item.docNumber}</td>
+      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300 hidden sm:table-cell">{item.customer}</td>
+      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-500 dark:text-slate-400">{item.sku}</td>
+      <td className="px-3 sm:px-6 py-4 text-sm max-w-xs hidden md:table-cell">
+        <div className="font-medium text-slate-800 dark:text-slate-200 truncate" title={item.productName}>{item.productName}</div>
+        <div className="text-xs text-slate-500 dark:text-slate-400 truncate" title={item.description}>{item.description}</div>
+      </td>
       <td className={`px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-center font-bold ${isNegativeFlow ? 'text-red-500' : 'text-green-500'}`}>
-        {item.qty}
+        {isNegativeFlow ? '-' : '+'} {item.qty}
       </td>
       <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-mono">{item.selectedLocation || 'N/A'}</td>
       <td className="px-3 sm:px-6 py-4 text-center"><StatusBadge status={item.status} t={t.status} /></td>
