@@ -1,3 +1,4 @@
+
 export type Language = 'en' | 'zh' | 'fr';
 
 export const translations = {
@@ -39,6 +40,7 @@ export const translations = {
         },
         exportButton: 'Export as CSV',
         fetchLogsTitle: 'Fetch Logs',
+        syncedDataTitle: 'Synced Data',
         logs: {
             waiting: 'Waiting for command...'
         },
@@ -124,6 +126,7 @@ export const translations = {
         },
         exportButton: '导出为 CSV',
         fetchLogsTitle: '抓取日志',
+        syncedDataTitle: '已同步数据',
         logs: {
             waiting: '等待命令...'
         },
@@ -209,6 +212,7 @@ export const translations = {
         },
         exportButton: 'Exporter en CSV',
         fetchLogsTitle: 'Logs de Recherche',
+        syncedDataTitle: 'Données Synchronisées',
         logs: {
             waiting: 'En attente de commande...'
         },

@@ -26,7 +26,7 @@ const dockItems = [
 export const Dock: React.FC<DockProps> = ({ activeView, setActiveView }) => {
   return (
     <footer className="w-full flex justify-center p-2 z-50">
-      <div className="flex items-end space-x-2 bg-slate-200/50 dark:bg-slate-800/50 backdrop-blur-lg border border-slate-300/50 dark:border-slate-700/50 rounded-2xl shadow-lg p-2">
+      <div className="flex items-end space-x-1 sm:space-x-2 bg-slate-200/50 dark:bg-slate-800/50 backdrop-blur-lg border border-slate-300/50 dark:border-slate-700/50 rounded-xl sm:rounded-2xl shadow-lg p-1.5 sm:p-2">
         {dockItems.map(item => (
           <div key={item.id} className="relative group">
             <span className="absolute bottom-full mb-2 w-max left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-800 text-white text-xs px-2 py-1 rounded-md transition-opacity duration-200">
@@ -34,7 +34,7 @@ export const Dock: React.FC<DockProps> = ({ activeView, setActiveView }) => {
             </span>
             <button
               onClick={() => setActiveView(item.id as View)}
-              className={`flex items-center justify-center h-14 w-14 rounded-xl transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-100 dark:focus:ring-offset-slate-900 transform hover:-translate-y-2 ${
+              className={`flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-lg sm:rounded-xl transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-100 dark:focus:ring-offset-slate-900 transform hover:-translate-y-1 sm:hover:-translate-y-2 ${
                 activeView === item.id 
                   ? 'bg-indigo-500 text-white shadow-md' 
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50'
@@ -42,7 +42,7 @@ export const Dock: React.FC<DockProps> = ({ activeView, setActiveView }) => {
               aria-label={item.label}
               aria-current={activeView === item.id}
             >
-              <item.icon className="h-7 w-7" />
+              <item.icon className="h-6 w-6 sm:h-7 sm:w-7" />
             </button>
           </div>
         ))}

@@ -110,11 +110,11 @@ const parseDescription = (description: string = ''): string => {
 };
 
 const rawMockData = [
-    { id: 'inv-1', date: '2023-10-26', type: 'Invoice' as DocType, docNumber: 'QB-84352', customer: 'John Doe', sku: 'WM-101', product: 'Wireless Mouse', description: 'Wireless Mouse @ A3-B2, A3-B3', qty: -1, shippingTo: '123 Main St' },
-    { id: 'inv-2', date: '2023-10-25', type: 'Invoice' as DocType, docNumber: 'QB-84350', customer: 'Momentum Corp', sku: 'LP-404', product: 'Laptop Pro 16"', description: 'Laptop Pro 16" @ C1-D3', qty: -2, shippingTo: '456 Corp Ave' },
-    { id: 'sr-1', date: '2023-10-24', type: 'Sale Receipts' as DocType, docNumber: 'QB-SR-1120', customer: 'Alice Johnson', sku: 'HD-606', product: 'Webcam HD', description: 'Webcam HD @ A2-B4, A2-B5', qty: -1, shippingTo: '789 Tech Rd' },
+    { id: 'inv-1', date: '2023-10-26', type: 'Invoice' as DocType, docNumber: 'QB-84352', customer: 'John Doe', sku: 'WM-101', product: 'Wireless Mouse', description: 'Wireless Mouse @ A3-B2, A3-B3', qty: 1, shippingTo: '123 Main St' },
+    { id: 'inv-2', date: '2023-10-25', type: 'Invoice' as DocType, docNumber: 'QB-84350', customer: 'Momentum Corp', sku: 'LP-404', product: 'Laptop Pro 16"', description: 'Laptop Pro 16" @ C1-D3', qty: 2, shippingTo: '456 Corp Ave' },
+    { id: 'sr-1', date: '2023-10-24', type: 'Sale Receipts' as DocType, docNumber: 'QB-SR-1120', customer: 'Alice Johnson', sku: 'HD-606', product: 'Webcam HD', description: 'Webcam HD @ A2-B4, A2-B5', qty: 1, shippingTo: '789 Tech Rd' },
     { id: 'cm-1', date: '2023-10-21', type: 'Credit Memo' as DocType, docNumber: 'QB-CM-205', customer: 'Apex Innovations', sku: 'WM-101', product: 'Wireless Mouse', description: 'Wireless Mouse (Return)', qty: 1, shippingTo: '101 Innovate Blvd' },
-    { id: 'inv-3', date: '2023-10-20', type: 'Invoice' as DocType, docNumber: 'QB-84348', customer: 'Robert Brown', sku: 'SPK-707', product: 'Bluetooth Speaker', description: 'Bluetooth Speaker @ D3-C1', qty: -2, shippingTo: '21 Jump Street' },
+    { id: 'inv-3', date: '2023-10-20', type: 'Invoice' as DocType, docNumber: 'QB-84348', customer: 'Robert Brown', sku: 'SPK-707', product: 'Bluetooth Speaker', description: 'Bluetooth Speaker @ D3-C1', qty: 2, shippingTo: '21 Jump Street' },
 ];
 
 export const MOCK_ADJUSTMENTS: AdjustmentLineItem[] = rawMockData.map((item, index) => ({
@@ -123,7 +123,6 @@ export const MOCK_ADJUSTMENTS: AdjustmentLineItem[] = rawMockData.map((item, ind
     docNumber: item.docNumber,
     sku: item.sku,
     description: parseDescription(item.description),
-    fullDescription: item.description,
     qty: item.qty,
     locations: parseLocations(item.description),
     selectedLocation: undefined,

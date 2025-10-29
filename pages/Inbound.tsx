@@ -65,31 +65,31 @@ const Inbound: React.FC = () => {
             <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
               <thead className="bg-slate-50 dark:bg-slate-700/50">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">PO Number</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">Supplier</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden md:table-cell">Expected</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">Status</th>
-                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">Actions</th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">PO Number</th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">Supplier</th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider hidden md:table-cell">Expected</th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">Status</th>
+                  <th scope="col" className="px-3 sm:px-6 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-300 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
                 {isLoading ? (
                   [...Array(3)].map((_, i) => (
                     <tr key={i} className="animate-pulse">
-                      <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-24"></div></td>
-                      <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-32"></div></td>
-                      <td className="px-6 py-4 hidden md:table-cell"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20"></div></td>
-                      <td className="px-6 py-4"><div className="h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-24"></div></td>
-                      <td className="px-6 py-4 text-center"><div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-24 mx-auto"></div></td>
+                      <td className="px-3 sm:px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-24"></div></td>
+                      <td className="px-3 sm:px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-32"></div></td>
+                      <td className="px-3 sm:px-6 py-4 hidden md:table-cell"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20"></div></td>
+                      <td className="px-3 sm:px-6 py-4"><div className="h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-24"></div></td>
+                      <td className="px-3 sm:px-6 py-4 text-center"><div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-24 mx-auto"></div></td>
                     </tr>
                   ))
                 ) : purchaseOrders.map((po) => (
                   <tr key={po.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600 dark:text-indigo-400">{po.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">{po.supplier}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 hidden md:table-cell">{new Date(po.expectedDelivery).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm"><POStatusBadge status={po.status} /></td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600 dark:text-indigo-400">{po.id}</td>
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">{po.supplier}</td>
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 hidden md:table-cell">{new Date(po.expectedDelivery).toLocaleDateString()}</td>
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm"><POStatusBadge status={po.status} /></td>
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                       <button 
                         onClick={() => setSelectedPO(po)}
                         disabled={po.status === PurchaseOrderStatus.Received}
@@ -111,7 +111,7 @@ const Inbound: React.FC = () => {
     <>
       <header className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex flex-wrap items-center justify-between py-3 sm:py-0 sm:h-16 gap-3">
             <div className="flex items-center space-x-3">
               <InboxArrowDownIcon className="h-7 w-7 text-indigo-500" />
               <h1 className="text-xl font-bold text-slate-900 dark:text-white">

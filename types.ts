@@ -77,7 +77,6 @@ export interface AdjustmentLineItem {
   docNumber: string;
   sku: string;
   description: string; // The part of the description before '@'
-  fullDescription?: string; // The original, unparsed description from QBO
   qty: number;
   locations: string[]; // Parsed locations
   selectedLocation?: string;

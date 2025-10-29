@@ -94,7 +94,7 @@ const Dashboard: React.FC<DashboardProps> = ({ language }) => {
     <>
       <header className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex flex-wrap items-center justify-between py-3 sm:py-0 sm:h-16 gap-3">
             <div className="flex items-center space-x-3">
               <HomeIcon className="h-8 w-8 text-indigo-500" />
               <h1 className="text-xl font-bold text-slate-900 dark:text-white">

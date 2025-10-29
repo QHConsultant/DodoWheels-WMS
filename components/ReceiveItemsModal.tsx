@@ -69,19 +69,19 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({ po, onClos
           <table className="min-w-full text-sm">
             <thead className="bg-slate-50 dark:bg-slate-700/50">
               <tr>
-                <th className="p-3 text-left font-medium text-slate-600 dark:text-slate-300">Product</th>
-                <th className="p-3 text-center font-medium text-slate-600 dark:text-slate-300">Ordered</th>
-                <th className="p-3 text-center font-medium text-slate-600 dark:text-slate-300">Received</th>
-                <th className="p-3 text-center font-medium text-slate-600 dark:text-slate-300">Receiving Now</th>
+                <th className="p-2 sm:p-3 text-left font-medium text-slate-600 dark:text-slate-300">Product</th>
+                <th className="p-2 sm:p-3 text-center font-medium text-slate-600 dark:text-slate-300">Ordered</th>
+                <th className="p-2 sm:p-3 text-center font-medium text-slate-600 dark:text-slate-300">Received</th>
+                <th className="p-2 sm:p-3 text-center font-medium text-slate-600 dark:text-slate-300">Receiving Now</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
               {po.items.map(item => (
                 <tr key={item.sku}>
-                  <td className="p-3 font-medium text-slate-800 dark:text-slate-200">{item.productName} <span className="text-slate-400 font-mono text-xs">{item.sku}</span></td>
-                  <td className="p-3 text-center text-slate-500 dark:text-slate-400">{item.quantityOrdered}</td>
-                  <td className="p-3 text-center text-slate-500 dark:text-slate-400">{item.quantityReceived}</td>
-                  <td className="p-3 text-center">
+                  <td className="p-2 sm:p-3 font-medium text-slate-800 dark:text-slate-200">{item.productName} <span className="text-slate-400 font-mono text-xs">{item.sku}</span></td>
+                  <td className="p-2 sm:p-3 text-center text-slate-500 dark:text-slate-400">{item.quantityOrdered}</td>
+                  <td className="p-2 sm:p-3 text-center text-slate-500 dark:text-slate-400">{item.quantityReceived}</td>
+                  <td className="p-2 sm:p-3 text-center">
                     <input
                       type="number"
                       value={receivedQuantities[item.sku] || ''}

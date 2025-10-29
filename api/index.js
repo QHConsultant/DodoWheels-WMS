@@ -76,7 +76,7 @@ router.get('/synced_data', async (req, res) => {
         sku: item.sku,
         product: item.product,
         description: item.description,
-        qty: item.qty,
+        qty: Math.abs(item.qty),
         shippingTo: item.shipping_to,
     }));
     res.json(formattedData);
@@ -225,18 +225,26 @@ router.get('/adjustments', async (req, res) => {
 
     if (error) return res.status(500).json({ error: error.message });
     
-    const formattedData = data.map(item => ({
-        id: item.id.toString(),
-        docType: item.doc_type,
-        docNumber: item.doc_number,
-        sku: item.sku,
-        description: item.description,
-        fullDescription: item.full_description,
-        qty: item.qty,
-        locations: item.locations || [],
-        selectedLocation: item.selected_location || '',
-        status: item.status,
-    }));
+    const formattedData = data.map(item => {
+        const rawDescription = item.description || '';
+        const descriptionParts = rawDescription.split('@');
+        const cleanDescription = descriptionParts[0].trim();
+        const locations = descriptionParts.length > 1 
+            ? descriptionParts[1].split(',').map(s => s.trim()).filter(Boolean) 
+            : [];
+
+        return {
+            id: item.id.toString(),
+            docType: item.doc_type,
+            docNumber: item.doc_number,
+            sku: item.sku,
+            description: cleanDescription,
+            qty: Math.abs(item.qty),
+            locations: locations,
+            selectedLocation: item.selected_location || '',
+            status: item.status,
+        };
+    });
     res.json(formattedData);
 });
 
