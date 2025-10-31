@@ -101,3 +101,17 @@ export interface QboSyncItem {
   qty: number;
   shippingTo: string;
 }
+
+export interface WebDataItem {
+    docNumber: string;
+    sku: string;
+    productName: string;
+    qty: number;
+}
+
+export interface ReconciliationItem {
+  sku: string;
+  webName: string;
+  qboName: string;
+  qboDescription: string;
+}

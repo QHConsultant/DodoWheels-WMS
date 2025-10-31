@@ -8,9 +8,10 @@ import Settings from './pages/Settings';
 import Adjustment from './pages/Adjustment';
 import QboSync from './pages/QboSync';
 import Login from './pages/Login';
+import DataReconciliation from './pages/DataReconciliation';
 import { Language } from './translations';
 
-export type View = 'dashboard' | 'inbound' | 'outbound' | 'inventory' | 'adjustment' | 'settings' | 'qbo-sync';
+export type View = 'dashboard' | 'inbound' | 'outbound' | 'inventory' | 'adjustment' | 'settings' | 'qbo-sync' | 'data-reconciliation';
 export type Theme = 'light' | 'dark' | 'system';
 
 export interface AppError {
@@ -42,7 +43,7 @@ const App: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     const view = params.get('view') as View;
     
-    if (view && ['dashboard', 'inbound', 'outbound', 'inventory', 'adjustment', 'settings', 'qbo-sync'].includes(view)) {
+    if (view && ['dashboard', 'inbound', 'outbound', 'inventory', 'adjustment', 'settings', 'qbo-sync', 'data-reconciliation'].includes(view)) {
       setActiveView(view);
     }
     
@@ -101,6 +102,8 @@ const App: React.FC = () => {
         return <QboSync language={language} />;
       case 'adjustment':
         return <Adjustment language={language} />;
+       case 'data-reconciliation':
+        return <DataReconciliation language={language} />;
       case 'settings':
         return <Settings theme={theme} setTheme={setTheme} onLogout={handleLogout} />;
       default:

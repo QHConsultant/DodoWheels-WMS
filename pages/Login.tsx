@@ -1,5 +1,4 @@
 import React, { useState, FormEvent } from 'react';
-import { DodoWheelsLogoIcon } from '../components/icons/DodoWheelsLogoIcon';
 import { translations, Language } from '../translations';
 
 interface LoginProps {
@@ -36,12 +35,9 @@ const Login: React.FC<LoginProps> = ({ onLogin, language, setLanguage }) => {
   return (
     <div className="min-h-screen h-screen flex flex-col justify-center items-center font-sans bg-slate-100 dark:bg-slate-900 p-4">
       <div className="w-full max-w-sm">
-        <div className="flex flex-col items-center mb-6">
-          <div className="bg-sky-500 p-3 rounded-xl mb-4">
-            <DodoWheelsLogoIcon className="h-8 w-32 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">DodoWheels</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">{t.subtitle}</p>
+        <div className="flex flex-col items-center mb-8">
+          <h1 className="text-5xl font-bold text-slate-900 dark:text-white">DodoWheel</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">{t.subtitle}</p>
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 sm:p-8">
