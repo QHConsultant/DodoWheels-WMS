@@ -84,6 +84,7 @@ export interface AdjustmentLineItem {
   locations: string[]; // Parsed locations
   selectedLocation?: string;
   status: AdjustmentStatus;
+  isNew?: boolean; // Flag for newly duplicated items to open in edit mode
 }
 
 export interface QboSyncItem {

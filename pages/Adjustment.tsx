@@ -41,15 +41,40 @@ const Adjustment: React.FC<AdjustmentProps> = ({ language }) => {
   }, [loadAdjustments]);
   
   const handleUpdate = async (updatedItem: AdjustmentLineItem) => {
-    console.log('[Page] handleUpdate: Attempting to update item.', { id: updatedItem.id });
+    console.log('[Page] handleUpdate: Attempting to update/create item.', { id: updatedItem.id });
+    const isNew = updatedItem.id.startsWith('new-');
+    const oldId = updatedItem.id;
+
     try {
         const result = await updateAdjustment(updatedItem);
-        console.log('[Page] handleUpdate: Update successful. Updating local state.', { result });
-        setAdjustments(prev => prev.map(item => item.id === updatedItem.id ? result : item));
+        console.log('[Page] handleUpdate: Update/create successful. Updating local state.', { result });
+        setAdjustments(prev => {
+            const newAdjustments = [...prev];
+            const index = newAdjustments.findIndex(item => item.id === (isNew ? oldId : updatedItem.id));
+            if (index !== -1) {
+                newAdjustments[index] = result;
+            }
+            return newAdjustments;
+        });
     } catch (err) {
         console.error('[Page] handleUpdate: Failed to update item.', { id: updatedItem.id, error: err });
         alert(`Failed to update item: ${(err as Error).message}`);
     }
+  };
+
+  const handleDuplicate = (itemToDuplicate: AdjustmentLineItem) => {
+    const newItem: AdjustmentLineItem = {
+      ...itemToDuplicate,
+      id: `new-${Date.now()}`,
+      status: AdjustmentStatus.Unconfirmed,
+      selectedLocation: undefined,
+      isNew: true, // Flag to auto-open in edit mode
+    };
+    // Find the index of the original item to insert the new one after it
+    const index = adjustments.findIndex(adj => adj.id === itemToDuplicate.id);
+    const newAdjustments = [...adjustments];
+    newAdjustments.splice(index + 1, 0, newItem);
+    setAdjustments(newAdjustments);
   };
 
   const filteredAdjustments = useMemo(() => {
@@ -110,6 +135,7 @@ const Adjustment: React.FC<AdjustmentProps> = ({ language }) => {
                             key={item.id}
                             item={item}
                             onUpdate={handleUpdate}
+                            onDuplicate={handleDuplicate}
                             language={language}
                         />
                     ))

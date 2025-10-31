@@ -1,5 +1,5 @@
 import { DocType, QboSyncItem } from '../types';
-import { supabase } from './supabaseService';
+import { MOCK_QBO_SYNC_ITEMS } from '../constants';
 
 const AGENT_BASE_URL = 'http://127.0.0.1:8008';
 
@@ -42,31 +42,12 @@ export const controlQboScraper = async (
 
 
 export const fetchSyncedData = async (): Promise<QboSyncItem[]> => {
-    console.log('[Service] Fetching synced_data directly from Supabase...');
-    const { data, error } = await supabase
-        .from('qbo_synced_data')
-        .select('*')
-        .order('doc_date', { ascending: false })
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        console.error("Supabase error fetching synced data:", error);
-        throw new Error(error.message);
-    }
-    
-    // Map to frontend type
-    return data.map(item => ({
-        id: item.id.toString(),
-        date: item.doc_date,
-        type: item.doc_type,
-        docNumber: item.doc_number,
-        customer: item.customer,
-        sku: item.sku,
-        product: item.product,
-        description: item.description,
-        qty: Math.abs(item.qty),
-        shippingTo: item.shipping_to,
-    }));
+    console.log('[Service] Fetching mock synced_data...');
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(MOCK_QBO_SYNC_ITEMS);
+        }, 500);
+    });
 };
 
 // This function now generates the CSV client-side from fetched data.

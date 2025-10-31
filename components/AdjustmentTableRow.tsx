@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { AdjustmentLineItem, AdjustmentStatus } from '../types';
 import { translations, Language } from '../translations';
 import { SearchableSelect } from './SearchableSelect';
+import { DocumentDuplicateIcon } from './icons/DocumentDuplicateIcon';
 
 interface AdjustmentTableRowProps {
   item: AdjustmentLineItem;
   onUpdate: (item: AdjustmentLineItem) => Promise<void>;
+  onDuplicate: (item: AdjustmentLineItem) => void;
   language: Language;
 }
 
@@ -22,15 +24,41 @@ const StatusBadge: React.FC<{ status: AdjustmentStatus; t: typeof translations['
   );
 };
 
-export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, onUpdate, language }) => {
+export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, onUpdate, onDuplicate, language }) => {
   const t = translations[language].adjustment;
   const [isEditing, setIsEditing] = useState(false);
   const [editableItem, setEditableItem] = useState(item);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    setEditableItem(item); // Sync with parent prop changes
+    setEditableItem(item);
   }, [item]);
+  
+  useEffect(() => {
+    if (item.isNew) {
+      setIsEditing(true);
+    }
+  }, [item.isNew]);
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) {
+      return 'N/A';
+    }
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'Invalid Date';
+    }
+    const locale = language === 'zh' ? 'zh-CN' : language === 'fr' ? 'fr-FR' : 'en-US';
+    return date.toLocaleDateString(locale, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+  };
+
+  const handleDuplicate = () => {
+    onDuplicate(item);
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -63,22 +91,6 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
     } else if (password !== null) {
         alert('Invalid password.');
     }
-  };
-  
-  const formatDate = (dateString: string) => {
-    if (!dateString) {
-      return 'N/A';
-    }
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return 'Invalid Date';
-    }
-    const locale = language === 'zh' ? 'zh-CN' : language === 'fr' ? 'fr-FR' : 'en-US';
-    return date.toLocaleDateString(locale, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    });
   };
 
   const isLocked = item.status === AdjustmentStatus.Confirmed;
@@ -129,6 +141,9 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
       <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-mono">{item.selectedLocation || 'N/A'}</td>
       <td className="px-3 sm:px-6 py-4 text-center"><StatusBadge status={item.status} t={t.status} /></td>
       <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
+        <button onClick={handleDuplicate} className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 disabled:opacity-50 inline-flex items-center justify-center p-1" title="Duplicate">
+            <DocumentDuplicateIcon className="h-5 w-5" />
+        </button>
         {!isLocked && <button onClick={() => setIsEditing(true)} disabled={isSaving} className="text-indigo-600 hover:text-indigo-800 disabled:opacity-50">{t.actions.edit}</button>}
         {isLocked ? (
              <button onClick={handleUnlock} disabled={isSaving} className="text-yellow-600 hover:text-yellow-800 disabled:opacity-50">{isSaving ? '...' : t.actions.unlock}</button>

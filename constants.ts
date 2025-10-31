@@ -1,4 +1,4 @@
-import { Order, OrderStatus, InventoryStatus, LineItem, PurchaseOrder, PurchaseOrderStatus, InventoryItem, AdjustmentLineItem, DocType, AdjustmentStatus } from './types';
+import { Order, OrderStatus, InventoryStatus, LineItem, PurchaseOrder, PurchaseOrderStatus, InventoryItem, AdjustmentLineItem, DocType, AdjustmentStatus, QboSyncItem } from './types';
 
 const generateLineItems = (orderId: string): LineItem[] => {
   const items: { [key: string]: LineItem[] } = {
@@ -116,6 +116,19 @@ const rawMockData = [
     { id: 'cm-1', date: '2023-10-21', type: 'Credit Memo' as DocType, docNumber: 'QB-CM-205', customer: 'Apex Innovations', sku: 'WM-101', product: 'Wireless Mouse', description: 'Wireless Mouse (Return)', qty: 1, shippingTo: '101 Innovate Blvd' },
     { id: 'inv-3', date: '2023-10-20', type: 'Invoice' as DocType, docNumber: 'QB-84348', customer: 'Robert Brown', sku: 'SPK-707', product: 'Bluetooth Speaker', description: 'Bluetooth Speaker @ D3-C1', qty: 2, shippingTo: '21 Jump Street' },
 ];
+
+export const MOCK_QBO_SYNC_ITEMS: QboSyncItem[] = rawMockData.map(item => ({
+    id: item.id,
+    date: item.date,
+    type: item.type,
+    docNumber: item.docNumber,
+    customer: item.customer,
+    sku: item.sku,
+    product: item.product,
+    description: item.description,
+    qty: item.qty,
+    shippingTo: item.shippingTo,
+}));
 
 export const MOCK_ADJUSTMENTS: AdjustmentLineItem[] = rawMockData.map((item, index) => ({
     id: String(index + 1),

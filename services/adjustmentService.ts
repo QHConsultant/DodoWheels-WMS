@@ -4,7 +4,10 @@ import { supabase } from './supabaseService';
 const parseLocations = (description: string = ''): string[] => {
     const parts = description.split('@');
     if (parts.length > 1) {
-      return parts[1].split(',').map(s => s.trim()).filter(Boolean);
+      return parts[1]
+        .split(',')
+        .map(s => s.trim().split('*')[0].trim())
+        .filter(Boolean);
     }
     return [];
 };
@@ -44,39 +47,68 @@ export const fetchAdjustments = async (): Promise<AdjustmentLineItem[]> => {
 };
 
 export const updateAdjustment = async (item: AdjustmentLineItem): Promise<AdjustmentLineItem> => {
-  console.log(`[Service] Updating adjustment ${item.id} directly in Supabase...`);
-  const { data, error } = await supabase
-    .from('qbo_synced_data')
-    .update({
-      sku: item.sku,
-      description: `${item.description} @ ${item.locations.join(', ')}`,
-      qty: item.qty,
-      selected_location: item.selectedLocation,
-      status: item.status,
-    })
-    .eq('id', item.id)
-    .select()
-    .single(); // .single() ensures we get a single object back, not an array
+  const isNew = item.id.startsWith('new-');
+
+  const fullDescription = item.locations.length > 0
+    ? `${item.description} @ ${item.locations.join(', ')}`
+    : item.description;
+
+  const signedQty = (item.docType === 'Invoice' || item.docType === 'Sale Receipts')
+    ? -Math.abs(item.qty)
+    : Math.abs(item.qty);
+
+  const payload = {
+    doc_date: item.date,
+    customer: item.customer,
+    product: item.productName,
+    doc_type: item.docType,
+    doc_number: item.docNumber,
+    sku: item.sku,
+    description: fullDescription,
+    qty: signedQty,
+    selected_location: item.selectedLocation,
+    status: item.status,
+  };
+
+  let response;
+  if (isNew) {
+    console.log('[Service] Inserting new adjustment in Supabase...');
+    response = await supabase
+      .from('qbo_synced_data')
+      .insert(payload)
+      .select()
+      .single();
+  } else {
+    console.log(`[Service] Updating adjustment ${item.id} in Supabase...`);
+    response = await supabase
+      .from('qbo_synced_data')
+      .update(payload)
+      .eq('id', item.id)
+      .select()
+      .single();
+  }
+
+  const { data, error } = response;
 
   if (error) {
-    console.error(`Supabase error updating adjustment ${item.id}:`, error);
-    throw new Error(`Failed to update adjustment: ${error.message}`);
+    const errorMessage = isNew ? 'inserting adjustment' : `updating adjustment ${item.id}`;
+    console.error(`Supabase error ${errorMessage}:`, error);
+    throw new Error(`Failed to ${isNew ? 'create' : 'update'} adjustment: ${error.message}`);
   }
-  
-  // Map the response back to the frontend model
-  const updatedItem = data;
+
+  const updatedItemFromDb = data;
   return {
-    id: updatedItem.id.toString(),
-    date: updatedItem.doc_date || '',
-    customer: updatedItem.customer || '',
-    productName: updatedItem.product || '',
-    docType: updatedItem.doc_type,
-    docNumber: updatedItem.doc_number || '',
-    sku: updatedItem.sku || '',
-    description: parseDescription(updatedItem.description),
-    qty: Math.abs(updatedItem.qty || 0),
-    locations: parseLocations(updatedItem.description),
-    selectedLocation: updatedItem.selected_location || undefined,
-    status: updatedItem.status || AdjustmentStatus.Unconfirmed,
+    id: updatedItemFromDb.id.toString(),
+    date: updatedItemFromDb.doc_date || '',
+    customer: updatedItemFromDb.customer || '',
+    productName: updatedItemFromDb.product || '',
+    docType: updatedItemFromDb.doc_type,
+    docNumber: updatedItemFromDb.doc_number || '',
+    sku: updatedItemFromDb.sku || '',
+    description: parseDescription(updatedItemFromDb.description),
+    qty: Math.abs(updatedItemFromDb.qty || 0),
+    locations: parseLocations(updatedItemFromDb.description),
+    selectedLocation: updatedItemFromDb.selected_location || undefined,
+    status: updatedItemFromDb.status || AdjustmentStatus.Unconfirmed,
   };
 };
