@@ -19,10 +19,10 @@ const KanbanCard: React.FC<{ order: Order; onClick: () => void }> = ({ order, on
       e.dataTransfer.effectAllowed = 'move';
     }}
     onClick={onClick}
-    className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 cursor-pointer hover:shadow-md hover:border-indigo-500 dark:hover:border-indigo-500 transition-all"
+    className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 cursor-pointer hover:shadow-md hover:border-sky-500 dark:hover:border-sky-500 transition-all"
   >
     <div className="flex justify-between items-center mb-2">
-      <p className="font-bold text-sm text-indigo-600 dark:text-indigo-400">{order.id}</p>
+      <p className="font-bold text-sm text-sky-600 dark:text-sky-400">{order.id}</p>
       <OrderStatusBadge status={order.status} />
     </div>
     <p className="text-sm text-slate-700 dark:text-slate-300 font-medium">{order.customerName}</p>
@@ -51,7 +51,7 @@ const KanbanColumn: React.FC<{
         setIsOver(false);
         onDrop(status, e);
       }}
-      className={`flex-1 min-w-[280px] w-1/4 bg-slate-100/50 dark:bg-slate-900/50 rounded-xl p-3 transition-colors ${isOver ? 'bg-indigo-100 dark:bg-indigo-900/50' : ''}`}
+      className={`flex-1 min-w-[280px] w-1/4 bg-slate-100/50 dark:bg-slate-900/50 rounded-xl p-3 transition-colors ${isOver ? 'bg-sky-100 dark:bg-sky-900/50' : ''}`}
     >
       <h3 className="font-semibold text-slate-800 dark:text-slate-200 px-2 pb-3">{title} ({orders.length})</h3>
       <div className="space-y-3 h-full overflow-y-auto">
@@ -174,7 +174,7 @@ const Outbound: React.FC<OutboundProps> = ({ language }) => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center justify-between py-3 sm:py-0 sm:h-16 gap-3">
             <div className="flex items-center space-x-3">
-              <ArrowUpOnSquareIcon className="h-7 w-7 text-indigo-500" />
+              <ArrowUpOnSquareIcon className="h-7 w-7 text-sky-500" />
               <h1 className="text-xl font-bold text-slate-900 dark:text-white">
                 Outbound Workflow
               </h1>
@@ -183,7 +183,7 @@ const Outbound: React.FC<OutboundProps> = ({ language }) => {
               <button
                 onClick={loadOrders}
                 disabled={isLoading}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <RefreshIcon className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
                 {isLoading ? 'Refreshing...' : 'Refresh Orders'}

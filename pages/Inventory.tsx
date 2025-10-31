@@ -90,7 +90,7 @@ const Inventory: React.FC = () => {
                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                       <button 
                         onClick={() => setItemToAdjust(item)}
-                        className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200"
+                        className="text-sky-600 hover:text-sky-900 dark:text-sky-400 dark:hover:text-sky-200"
                       >
                         Adjust Stock
                       </button>
@@ -110,7 +110,7 @@ const Inventory: React.FC = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center justify-between py-3 sm:h-16 sm:py-0 gap-4">
             <div className="flex items-center space-x-3">
-              <ArchiveBoxIcon className="h-7 w-7 text-indigo-500" />
+              <ArchiveBoxIcon className="h-7 w-7 text-sky-500" />
               <h1 className="text-xl font-bold text-slate-900 dark:text-white">
                 Inventory Control
               </h1>
@@ -122,13 +122,13 @@ const Inventory: React.FC = () => {
                     placeholder="Search by name or SKU..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
                   />
                 </div>
                 <button
                   onClick={loadInventory}
                   disabled={isLoading}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <RefreshIcon className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
                   Refresh

@@ -71,7 +71,7 @@ const CustomTooltip = ({ active, payload, label, language }: any) => {
     return (
       <div className="p-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md shadow-lg">
         <p className="label font-semibold">{`${label}`}</p>
-        <p className="intro text-indigo-500 dark:text-indigo-400">{`${t.sales}: ${new Intl.NumberFormat(locale, { style: 'currency', currency: currency }).format(payload[0].value)}`}</p>
+        <p className="intro text-sky-500 dark:text-sky-400">{`${t.sales}: ${new Intl.NumberFormat(locale, { style: 'currency', currency: currency }).format(payload[0].value)}`}</p>
       </div>
     );
   }
@@ -125,7 +125,7 @@ export const SalesChart: React.FC<SalesChartProps> = ({ orders, isLoading, langu
               cursor={{ fill: 'rgba(100, 116, 139, 0.1)' }} 
             />
             <Legend wrapperStyle={{ fontSize: '14px' }} />
-            <Bar dataKey={t.sales} fill="rgb(99 102 241)" radius={[4, 4, 0, 0]} />
+            <Bar dataKey={t.sales} fill="rgb(14 165 233)" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

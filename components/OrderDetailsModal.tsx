@@ -59,7 +59,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
         <header className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
           <div>
             <h2 id="modal-title" className="text-lg font-bold text-slate-900 dark:text-white">Order Details</h2>
-            <p className="text-sm text-indigo-600 dark:text-indigo-400 font-mono">{order.id}</p>
+            <p className="text-sm text-sky-600 dark:text-sky-400 font-mono">{order.id}</p>
           </div>
           <button
             onClick={onClose}
@@ -127,7 +127,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
           {canStartPicking && (
             <button
               onClick={() => onUpdateStatus(order.id, OrderStatus.Picking)}
-              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-sky-600 rounded-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
             >
               Start Picking
             </button>

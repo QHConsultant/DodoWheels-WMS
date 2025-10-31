@@ -85,7 +85,7 @@ const Inbound: React.FC = () => {
                   ))
                 ) : purchaseOrders.map((po) => (
                   <tr key={po.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600 dark:text-indigo-400">{po.id}</td>
+                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-sky-600 dark:text-sky-400">{po.id}</td>
                     <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">{po.supplier}</td>
                     <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 hidden md:table-cell">{new Date(po.expectedDelivery).toLocaleDateString()}</td>
                     <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm"><POStatusBadge status={po.status} /></td>
@@ -93,7 +93,7 @@ const Inbound: React.FC = () => {
                       <button 
                         onClick={() => setSelectedPO(po)}
                         disabled={po.status === PurchaseOrderStatus.Received}
-                        className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-indigo-600"
+                        className="text-sky-600 hover:text-sky-900 dark:text-sky-400 dark:hover:text-sky-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-sky-600"
                       >
                         Receive Items
                       </button>
@@ -113,7 +113,7 @@ const Inbound: React.FC = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center justify-between py-3 sm:py-0 sm:h-16 gap-3">
             <div className="flex items-center space-x-3">
-              <InboxArrowDownIcon className="h-7 w-7 text-indigo-500" />
+              <InboxArrowDownIcon className="h-7 w-7 text-sky-500" />
               <h1 className="text-xl font-bold text-slate-900 dark:text-white">
                 Inbound Operations
               </h1>
@@ -122,7 +122,7 @@ const Inbound: React.FC = () => {
                <button
                   onClick={loadPOs}
                   disabled={isLoading}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <RefreshIcon className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
                   {isLoading ? 'Refreshing...' : 'Refresh POs'}

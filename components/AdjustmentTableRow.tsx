@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { AdjustmentLineItem, AdjustmentStatus } from '../types';
 import { translations, Language } from '../translations';
 import { SearchableSelect } from './SearchableSelect';
-import { DocumentDuplicateIcon } from './icons/DocumentDuplicateIcon';
 
 interface AdjustmentTableRowProps {
   item: AdjustmentLineItem;
   onUpdate: (item: AdjustmentLineItem) => Promise<void>;
-  onDuplicate: (item: AdjustmentLineItem) => void;
+  onCopy: (item: AdjustmentLineItem) => void;
   language: Language;
 }
 
@@ -24,7 +23,22 @@ const StatusBadge: React.FC<{ status: AdjustmentStatus; t: typeof translations['
   );
 };
 
-export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, onUpdate, onDuplicate, language }) => {
+const YNBadge: React.FC<{ status: 'YES' | 'NO' | 'N/A' }> = ({ status }) => {
+    if (status === 'N/A') {
+        return <span className="text-xs text-slate-400">N/A</span>;
+    }
+    const styles = {
+        'YES': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+        'NO': 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300',
+    };
+    return (
+        <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${styles[status]}`}>
+            {status}
+        </span>
+    );
+};
+
+export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, onUpdate, onCopy, language }) => {
   const t = translations[language].adjustment;
   const [isEditing, setIsEditing] = useState(false);
   const [editableItem, setEditableItem] = useState(item);
@@ -41,13 +55,9 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
   }, [item.isNew]);
 
   const formatDate = (dateString: string) => {
-    if (!dateString) {
-      return 'N/A';
-    }
+    if (!dateString) return 'N/A';
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return 'Invalid Date';
-    }
+    if (isNaN(date.getTime())) return 'Invalid Date';
     const locale = language === 'zh' ? 'zh-CN' : language === 'fr' ? 'fr-FR' : 'en-US';
     return date.toLocaleDateString(locale, {
         year: 'numeric',
@@ -56,11 +66,16 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
     });
   };
 
-  const handleDuplicate = () => {
-    onDuplicate(item);
+  const handleCopy = () => {
+    onCopy(item);
   };
 
   const handleSave = async () => {
+    // For copied items, a location must be selected.
+    if (item.isNew && !editableItem.selectedLocation) {
+      alert('Please select a location before saving.');
+      return;
+    }
     setIsSaving(true);
     await onUpdate(editableItem);
     setIsSaving(false);
@@ -72,28 +87,6 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
     setIsEditing(false);
   };
 
-  const handleLock = async () => {
-      if (!editableItem.selectedLocation) {
-          alert('Please select a location before locking.');
-          return;
-      }
-      setIsSaving(true);
-      await onUpdate({ ...editableItem, status: AdjustmentStatus.Confirmed });
-      setIsSaving(false);
-  };
-
-  const handleUnlock = async () => {
-    const password = prompt(t.unlockPrompt);
-    if (password === 'password') { // Hardcoded password
-        setIsSaving(true);
-        await onUpdate({ ...editableItem, status: AdjustmentStatus.Unconfirmed });
-        setIsSaving(false);
-    } else if (password !== null) {
-        alert('Invalid password.');
-    }
-  };
-
-  const isLocked = item.status === AdjustmentStatus.Confirmed;
   const isNegativeFlow = item.docType === 'Invoice' || item.docType === 'Sale Receipts';
 
   if (isEditing) {
@@ -117,6 +110,7 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
             />
         </td>
         <td className="px-3 sm:px-6 py-4 text-center"><StatusBadge status={item.status} t={t.status} /></td>
+        <td className="px-3 sm:px-6 py-4 text-center"><YNBadge status={item.yn || 'N/A'} /></td>
         <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
             <button onClick={handleSave} disabled={isSaving} className="text-green-600 hover:text-green-800 disabled:opacity-50">{isSaving ? '...' : t.actions.save}</button>
             <button onClick={handleCancel} disabled={isSaving} className="text-slate-500 hover:text-slate-700 disabled:opacity-50">{t.actions.cancel}</button>
@@ -128,7 +122,7 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
   return (
     <tr className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
       <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 hidden lg:table-cell">{formatDate(item.date)}</td>
-      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600 dark:text-indigo-400">{item.docNumber}</td>
+      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-sky-600 dark:text-sky-400">{item.docNumber}</td>
       <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300 hidden sm:table-cell">{item.customer}</td>
       <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-500 dark:text-slate-400">{item.sku}</td>
       <td className="px-3 sm:px-6 py-4 text-sm max-w-xs hidden md:table-cell">
@@ -140,15 +134,17 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
       </td>
       <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-mono">{item.selectedLocation || 'N/A'}</td>
       <td className="px-3 sm:px-6 py-4 text-center"><StatusBadge status={item.status} t={t.status} /></td>
-      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
-        <button onClick={handleDuplicate} className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 disabled:opacity-50 inline-flex items-center justify-center p-1" title="Duplicate">
-            <DocumentDuplicateIcon className="h-5 w-5" />
-        </button>
-        {!isLocked && <button onClick={() => setIsEditing(true)} disabled={isSaving} className="text-indigo-600 hover:text-indigo-800 disabled:opacity-50">{t.actions.edit}</button>}
-        {isLocked ? (
-             <button onClick={handleUnlock} disabled={isSaving} className="text-yellow-600 hover:text-yellow-800 disabled:opacity-50">{isSaving ? '...' : t.actions.unlock}</button>
+      <td className="px-3 sm:px-6 py-4 text-center"><YNBadge status={item.yn || 'N/A'} /></td>
+      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-4">
+        {item.status === AdjustmentStatus.Unconfirmed ? (
+            <>
+                <button onClick={handleCopy} className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+                    Copy
+                </button>
+                <button onClick={() => setIsEditing(true)} className="text-sky-600 hover:text-sky-800">{t.actions.edit}</button>
+            </>
         ) : (
-             <button onClick={handleLock} disabled={isSaving || !item.selectedLocation} className="text-blue-600 hover:text-blue-800 disabled:opacity-50">{isSaving ? '...' : t.actions.lock}</button>
+            <span className="text-xs text-slate-400 dark:text-slate-500 italic">Confirmed</span>
         )}
       </td>
     </tr>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Order, OrderStatus } from '../types';
 import { fetchOrders, updateOrderStatus } from '../services/qboService';
 import { OrderTable } from '../components/OrderTable';
@@ -7,6 +7,8 @@ import { RefreshIcon } from '../components/icons/RefreshIcon';
 import { OrderDetailsModal } from '../components/OrderDetailsModal';
 import { HomeIcon } from '../components/icons/HomeIcon';
 import { translations, Language } from '../translations';
+import { KeyMetrics } from '../components/KeyMetrics';
+import { OrderStatusPieChart } from '../components/OrderStatusPieChart';
 
 
 interface DashboardProps {
@@ -27,7 +29,8 @@ const Dashboard: React.FC<DashboardProps> = ({ language }) => {
     try {
       const fetchedOrders = await fetchOrders();
       setOrders(fetchedOrders);
-    } catch (err: any) {
+    } catch (err: any)
+ {
       console.error('Failed to fetch orders:', err);
       setError(err.message || 'Failed to fetch orders. Please try again.');
     } finally {
@@ -64,6 +67,19 @@ const Dashboard: React.FC<DashboardProps> = ({ language }) => {
     }
   };
   
+  const metrics = useMemo(() => {
+    const revenue = orders
+      .filter(o => o.status !== OrderStatus.Cancelled)
+      .reduce((sum, o) => sum + o.totalAmount, 0);
+    const pending = orders.filter(o => o.status === OrderStatus.Pending).length;
+    const completed = orders.filter(o => o.status === OrderStatus.Completed).length;
+    const totalOrders = orders.filter(o => o.status !== OrderStatus.Cancelled).length;
+    const avgValue = totalOrders > 0 ? revenue / totalOrders : 0;
+    
+    return { revenue, pending, completed, avgValue };
+  }, [orders]);
+
+
   const renderContent = () => {
     if (error) {
       return (
@@ -76,8 +92,18 @@ const Dashboard: React.FC<DashboardProps> = ({ language }) => {
     const showSkeleton = isLoading && orders.length === 0;
 
     return (
-      <div className="grid grid-cols-1 gap-8">
-        <SalesChart orders={orders} isLoading={showSkeleton} language={language} />
+      <div className="grid grid-cols-1 gap-6 lg:gap-8">
+        <KeyMetrics metrics={metrics} isLoading={showSkeleton} language={language} />
+
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
+          <div className="lg:col-span-3">
+             <SalesChart orders={orders} isLoading={showSkeleton} language={language} />
+          </div>
+          <div className="lg:col-span-2">
+            <OrderStatusPieChart orders={orders} isLoading={showSkeleton} language={language} />
+          </div>
+        </div>
+        
         <OrderTable
           orders={orders}
           isLoading={showSkeleton}
@@ -96,7 +122,7 @@ const Dashboard: React.FC<DashboardProps> = ({ language }) => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center justify-between py-3 sm:py-0 sm:h-16 gap-3">
             <div className="flex items-center space-x-3">
-              <HomeIcon className="h-8 w-8 text-indigo-500" />
+              <HomeIcon className="h-8 w-8 text-sky-500" />
               <h1 className="text-xl font-bold text-slate-900 dark:text-white">
                 {t.title}
               </h1>
@@ -105,7 +131,7 @@ const Dashboard: React.FC<DashboardProps> = ({ language }) => {
               <button
                 onClick={loadOrders}
                 disabled={isLoading}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <RefreshIcon className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
                 {isLoading ? t.refreshing : t.refreshButton}

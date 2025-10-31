@@ -100,7 +100,7 @@ export const OrderTable: React.FC<OrderTableProps> = ({ orders, isLoading, error
                 className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
                 onClick={() => onRowClick(order)}
               >
-                <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600 dark:text-indigo-400">{order.id}</td>
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-sky-600 dark:text-sky-400">{order.id}</td>
                 <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">{order.customerName}</td>
                 <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 hidden md:table-cell">{formatDate(order.orderDate)}</td>
                 <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm"><OrderStatusBadge status={order.status} /></td>

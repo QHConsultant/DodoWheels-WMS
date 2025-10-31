@@ -85,6 +85,8 @@ export interface AdjustmentLineItem {
   selectedLocation?: string;
   status: AdjustmentStatus;
   isNew?: boolean; // Flag for newly duplicated items to open in edit mode
+  originalId?: string; // To link back to the copied item
+  yn?: 'YES' | 'NO' | 'N/A';
 }
 
 export interface QboSyncItem {

@@ -1,4 +1,5 @@
 
+
 export type Language = 'en' | 'zh' | 'fr';
 
 export const translations = {
@@ -7,6 +8,15 @@ export const translations = {
       title: 'Dashboard',
       refreshButton: 'Refresh',
       refreshing: 'Refreshing...',
+      kpis: {
+        totalRevenue: 'Total Revenue',
+        pendingOrders: 'Pending Orders',
+        completedOrders: 'Completed Orders',
+        avgOrderValue: 'Avg. Order Value',
+      },
+      pieChart: {
+        title: 'Order Status Distribution',
+      },
     },
     orderTable: {
       title: 'Recent Orders',
@@ -60,10 +70,17 @@ export const translations = {
     adjustment: {
         title: 'Inventory Adjustments',
         searchPlaceholder: 'Search doc #, SKU, or description...',
+        exportButton: 'Export',
+        exporting: 'Exporting...',
         status: {
             all: 'All Statuses',
             unconfirmed: 'Unconfirmed',
             confirmed: 'Confirmed',
+        },
+        ynStatus: {
+            all: 'All Import Statuses',
+            yes: 'Imported',
+            no: 'Not Imported',
         },
         tableHeaders: {
             date: 'Date',
@@ -77,6 +94,7 @@ export const translations = {
             locations: 'Location',
             status: 'Status',
             action: 'Action',
+            imported: 'Imported',
         },
         actions: {
             edit: 'Edit',
@@ -97,6 +115,15 @@ export const translations = {
       title: '仪表盘',
       refreshButton: '刷新',
       refreshing: '刷新中...',
+      kpis: {
+        totalRevenue: '总收入',
+        pendingOrders: '待处理订单',
+        completedOrders: '已完成订单',
+        avgOrderValue: '平均订单价值',
+      },
+      pieChart: {
+        title: '订单状态分布',
+      },
     },
     orderTable: {
       title: '近期订单',
@@ -150,10 +177,17 @@ export const translations = {
     adjustment: {
         title: '库存调整',
         searchPlaceholder: '搜索单据号, SKU, 或描述...',
+        exportButton: '导出',
+        exporting: '导出中...',
         status: {
             all: '所有状态',
             unconfirmed: '未确认',
             confirmed: '已确认',
+        },
+        ynStatus: {
+            all: '所有导入状态',
+            yes: '已导入',
+            no: '未导入',
         },
         tableHeaders: {
             date: '日期',
@@ -167,6 +201,7 @@ export const translations = {
             locations: '库位',
             status: '状态',
             action: '操作',
+            imported: '已导入',
         },
         actions: {
             edit: '编辑',
@@ -187,6 +222,15 @@ export const translations = {
       title: 'Tableau de bord',
       refreshButton: 'Actualiser',
       refreshing: 'Actualisation...',
+      kpis: {
+        totalRevenue: 'Revenu Total',
+        pendingOrders: 'Commandes en Attente',
+        completedOrders: 'Commandes Terminées',
+        avgOrderValue: 'Valeur Moy. Commande',
+      },
+      pieChart: {
+        title: 'Répartition des Statuts',
+      },
     },
     orderTable: {
       title: 'Commandes Récentes',
@@ -240,10 +284,17 @@ export const translations = {
     adjustment: {
         title: 'Ajustements d\'Inventaire',
         searchPlaceholder: 'Rechercher par N° doc, SKU...',
+        exportButton: 'Exporter',
+        exporting: 'Exportation...',
         status: {
             all: 'Tous les Statuts',
             unconfirmed: 'Non Confirmé',
             confirmed: 'Confirmé',
+        },
+        ynStatus: {
+            all: "Tous les statuts d'import",
+            yes: 'Importé',
+            no: 'Non importé',
         },
         tableHeaders: {
             date: 'Date',
@@ -257,6 +308,7 @@ export const translations = {
             locations: 'Emplacement',
             status: 'Statut',
             action: 'Action',
+            imported: 'Importé',
         },
         actions: {
             edit: 'Modifier',

@@ -1,5 +1,5 @@
 import React, { useState, FormEvent } from 'react';
-import { ArchiveBoxIcon } from '../components/icons/ArchiveBoxIcon';
+import { DodoWheelsLogoIcon } from '../components/icons/DodoWheelsLogoIcon';
 import { translations, Language } from '../translations';
 
 interface LoginProps {
@@ -37,10 +37,10 @@ const Login: React.FC<LoginProps> = ({ onLogin, language, setLanguage }) => {
     <div className="min-h-screen h-screen flex flex-col justify-center items-center font-sans bg-slate-100 dark:bg-slate-900 p-4">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-6">
-          <div className="bg-indigo-500 p-3 rounded-xl mb-4">
-            <ArchiveBoxIcon className="h-8 w-8 text-white" />
+          <div className="bg-sky-500 p-3 rounded-xl mb-4">
+            <DodoWheelsLogoIcon className="h-8 w-32 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">WMS Pro</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">DodoWheels</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">{t.subtitle}</p>
         </div>
 
@@ -60,7 +60,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, language, setLanguage }) => {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-sm shadow-sm placeholder-slate-400
-                           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                           focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                 placeholder="admin"
               />
             </div>
@@ -79,7 +79,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, language, setLanguage }) => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-sm shadow-sm placeholder-slate-400
-                           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                           focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                 placeholder="password"
               />
             </div>
@@ -89,9 +89,9 @@ const Login: React.FC<LoginProps> = ({ onLogin, language, setLanguage }) => {
                     <button
                         type="button"
                         onClick={() => setLanguage('en')}
-                        className={`flex-1 rounded-md px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
+                        className={`flex-1 rounded-md px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
                             language === 'en'
-                            ? 'bg-white text-indigo-600 shadow-sm dark:bg-slate-900'
+                            ? 'bg-white text-sky-600 shadow-sm dark:bg-slate-900'
                             : 'text-slate-600 hover:bg-white/60 dark:text-slate-300 dark:hover:bg-slate-900/60'
                         }`}
                         >
@@ -100,9 +100,9 @@ const Login: React.FC<LoginProps> = ({ onLogin, language, setLanguage }) => {
                     <button
                         type="button"
                         onClick={() => setLanguage('zh')}
-                        className={`flex-1 rounded-md px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
+                        className={`flex-1 rounded-md px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
                             language === 'zh'
-                            ? 'bg-white text-indigo-600 shadow-sm dark:bg-slate-900'
+                            ? 'bg-white text-sky-600 shadow-sm dark:bg-slate-900'
                             : 'text-slate-600 hover:bg-white/60 dark:text-slate-300 dark:hover:bg-slate-900/60'
                         }`}
                         >
@@ -111,9 +111,9 @@ const Login: React.FC<LoginProps> = ({ onLogin, language, setLanguage }) => {
                      <button
                         type="button"
                         onClick={() => setLanguage('fr')}
-                        className={`flex-1 rounded-md px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
+                        className={`flex-1 rounded-md px-3 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
                             language === 'fr'
-                            ? 'bg-white text-indigo-600 shadow-sm dark:bg-slate-900'
+                            ? 'bg-white text-sky-600 shadow-sm dark:bg-slate-900'
                             : 'text-slate-600 hover:bg-white/60 dark:text-slate-300 dark:hover:bg-slate-900/60'
                         }`}
                         >
@@ -130,8 +130,8 @@ const Login: React.FC<LoginProps> = ({ onLogin, language, setLanguage }) => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
-                           disabled:bg-indigo-400 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500
+                           disabled:bg-sky-400 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

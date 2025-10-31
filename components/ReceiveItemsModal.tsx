@@ -58,7 +58,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({ po, onClos
         <header className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">Receive Items for PO</h2>
-            <p className="text-sm text-indigo-600 dark:text-indigo-400 font-mono">{po.id}</p>
+            <p className="text-sm text-sky-600 dark:text-sky-400 font-mono">{po.id}</p>
           </div>
           <button onClick={onClose} className="p-2 rounded-full text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700" aria-label="Close modal">
             <XIcon className="h-6 w-6" />
@@ -88,7 +88,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({ po, onClos
                       onChange={(e) => handleQuantityChange(item.sku, e.target.value)}
                       min="0"
                       max={item.quantityOrdered - item.quantityReceived}
-                      className="w-20 p-1 text-center bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-20 p-1 text-center bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
                       disabled={(item.quantityOrdered - item.quantityReceived) <= 0}
                     />
                   </td>
@@ -104,7 +104,7 @@ export const ReceiveItemsModal: React.FC<ReceiveItemsModalProps> = ({ po, onClos
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="px-4 py-2 text-sm font-medium text-white bg-sky-600 rounded-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
           >
             Confirm Receipt
           </button>

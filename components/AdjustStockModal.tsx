@@ -53,7 +53,7 @@ export const AdjustStockModal: React.FC<AdjustStockModalProps> = ({ item, onClos
               value={newQuantity}
               onChange={(e) => setNewQuantity(e.target.value)}
               min="0"
-              className="w-full p-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
             />
           </div>
           <div>
@@ -62,7 +62,7 @@ export const AdjustStockModal: React.FC<AdjustStockModalProps> = ({ item, onClos
                 id="reason"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="w-full p-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
              >
                 <option>Cycle Count</option>
                 <option>Damaged Goods</option>
@@ -77,7 +77,7 @@ export const AdjustStockModal: React.FC<AdjustStockModalProps> = ({ item, onClos
           <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600">
             Cancel
           </button>
-          <button onClick={handleSave} className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+          <button onClick={handleSave} className="px-4 py-2 text-sm font-medium text-white bg-sky-600 rounded-md hover:bg-sky-700">
             Save Changes
           </button>
         </footer>

@@ -34,9 +34,9 @@ export const Dock: React.FC<DockProps> = ({ activeView, setActiveView }) => {
             </span>
             <button
               onClick={() => setActiveView(item.id as View)}
-              className={`flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-lg sm:rounded-xl transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-100 dark:focus:ring-offset-slate-900 transform hover:-translate-y-1 sm:hover:-translate-y-2 ${
+              className={`flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-lg sm:rounded-xl transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-100 dark:focus:ring-offset-slate-900 transform hover:-translate-y-1 sm:hover:-translate-y-2 ${
                 activeView === item.id 
-                  ? 'bg-indigo-500 text-white shadow-md' 
+                  ? 'bg-sky-500 text-white shadow-md' 
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50'
               }`}
               aria-label={item.label}

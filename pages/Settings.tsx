@@ -33,7 +33,7 @@ const Settings: React.FC<SettingsProps> = ({ theme, setTheme, onLogout }) => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <Cog6ToothIcon className="h-7 w-7 text-indigo-500" />
+              <Cog6ToothIcon className="h-7 w-7 text-sky-500" />
               <h1 className="text-xl font-bold text-slate-900 dark:text-white">
                 System Settings
               </h1>
@@ -52,9 +52,9 @@ const Settings: React.FC<SettingsProps> = ({ theme, setTheme, onLogout }) => {
                 <button
                   key={option.value}
                   onClick={() => setTheme(option.value as Theme)}
-                  className={`flex-1 flex items-center justify-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
+                  className={`flex-1 flex items-center justify-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
                     theme === option.value
-                      ? 'bg-white text-indigo-600 shadow-sm dark:bg-slate-900'
+                      ? 'bg-white text-sky-600 shadow-sm dark:bg-slate-900'
                       : 'text-slate-600 hover:bg-white/60 dark:text-slate-300 dark:hover:bg-slate-900/60'
                   }`}
                 >
