@@ -66,8 +66,15 @@ export const AdjustmentTableRow: React.FC<AdjustmentTableRowProps> = ({ item, on
   };
   
   const formatDate = (dateString: string) => {
+    if (!dateString) {
+      return 'N/A';
+    }
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'Invalid Date';
+    }
     const locale = language === 'zh' ? 'zh-CN' : language === 'fr' ? 'fr-FR' : 'en-US';
-    return new Date(dateString).toLocaleDateString(locale, {
+    return date.toLocaleDateString(locale, {
         year: 'numeric',
         month: 'short',
         day: 'numeric',

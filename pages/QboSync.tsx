@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { DocType, QboSyncItem } from '../types';
-import { controlQboScraper, fetchSyncedData } from '../services/qboSyncService';
+import { controlQboScraper, fetchSyncedData, generateAndDownloadCsv } from '../services/qboSyncService';
 import { DocumentPlusIcon } from '../components/icons/DocumentPlusIcon';
 import { Language, translations } from '../translations';
 import { RefreshIcon } from '../components/icons/RefreshIcon';
@@ -122,6 +122,14 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
         }
     };
 
+    const handleExport = async () => {
+        try {
+            await generateAndDownloadCsv();
+        } catch(e) {
+            alert(`Failed to export: ${(e as Error).message}`);
+        }
+    };
+
     return (
       <>
         <header className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
@@ -185,12 +193,12 @@ const QboSync: React.FC<QboSyncProps> = ({ language }) => {
                     <div className="p-4 sm:p-6 flex justify-between items-center">
                         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t.syncedDataTitle}</h2>
                         <div className="flex items-center space-x-2">
-                             <a href="/api/export_csv" download
+                             <button onClick={handleExport}
                                 className="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600/50"
                             >
                                 <ArrowDownTrayIcon className="h-5 w-5" />
                                 <span className="hidden sm:inline">{t.exportButton}</span>
-                            </a>
+                            </button>
                             <button
                                 onClick={loadSyncedData}
                                 disabled={isDataLoading}

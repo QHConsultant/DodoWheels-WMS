@@ -59,11 +59,11 @@ const Adjustment: React.FC<AdjustmentProps> = ({ language }) => {
         return item.status === statusFilter;
       })
       .filter(item =>
-        item.docNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchTerm.toLowerCase())
+        (item.docNumber || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.sku || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.productName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.customer || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.description || '').toLowerCase().includes(searchTerm.toLowerCase())
       );
   }, [adjustments, searchTerm, statusFilter]);
 

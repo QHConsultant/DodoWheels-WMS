@@ -1,26 +1,64 @@
-import { MOCK_ORDERS } from '../constants';
 import { Order, OrderStatus } from '../types';
-
-let mockOrdersDB = JSON.parse(JSON.stringify(MOCK_ORDERS));
+import { supabase } from './supabaseService';
 
 export const fetchOrders = async (): Promise<Order[]> => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  // Return a copy to prevent direct mutation of the mock data
-  return Promise.resolve(JSON.parse(JSON.stringify(mockOrdersDB)));
+  console.log('[Service] Fetching orders directly from Supabase...');
+  const { data, error } = await supabase
+    .from('orders')
+    .select(`
+        id,
+        customer_name,
+        order_date,
+        status,
+        total_amount,
+        order_line_items ( * )
+    `)
+    .order('order_date', { ascending: false });
+
+  if (error) {
+    console.error("Supabase error fetching orders:", error);
+    throw new Error(error.message);
+  }
+
+  // Map to frontend camelCase format
+  return data.map(order => ({
+    id: order.id,
+    customerName: order.customer_name,
+    orderDate: order.order_date,
+    status: order.status,
+    totalAmount: order.total_amount,
+    lineItems: order.order_line_items.map((item: any) => ({
+      sku: item.sku,
+      productName: item.product_name,
+      quantity: item.quantity,
+      location: item.location,
+      stockStatus: item.stock_status,
+    }))
+  }));
 };
 
 export const updateOrderStatus = async (orderId: string, status: OrderStatus): Promise<Order> => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 300));
+    console.log(`[Service] Updating order ${orderId} to status ${status} directly in Supabase`);
+    const { data, error } = await supabase
+      .from('orders')
+      .update({ status })
+      .eq('id', orderId)
+      .select()
+      .single();
     
-    const orderIndex = mockOrdersDB.findIndex((o: Order) => o.id === orderId);
-
-    if (orderIndex === -1) {
-        throw new Error('Order not found');
+    if (error) {
+      console.error("Supabase error updating order status:", error);
+      throw new Error(error.message);
     }
-
-    mockOrdersDB[orderIndex] = { ...mockOrdersDB[orderIndex], status };
-
-    return Promise.resolve(mockOrdersDB[orderIndex]);
+    
+    // The updated data is returned, we just need to ensure the keys are camelCased
+    // (though in this case, only 'status' is updated, which is already correct)
+    const result = data as any;
+    return {
+        ...result,
+        customerName: result.customer_name,
+        orderDate: result.order_date,
+        totalAmount: result.total_amount,
+        lineItems: [] // This data isn't returned on update, assume unchanged on frontend
+    };
 }

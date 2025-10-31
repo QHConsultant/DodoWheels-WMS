@@ -1,31 +1,47 @@
-import { MOCK_INVENTORY } from '../constants';
 import { InventoryItem } from '../types';
-
-let mockInventoryDB = JSON.parse(JSON.stringify(MOCK_INVENTORY));
+import { supabase } from './supabaseService';
 
 export const fetchInventory = async (): Promise<InventoryItem[]> => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return Promise.resolve(JSON.parse(JSON.stringify(mockInventoryDB)));
+  console.log('[Service] Fetching inventory directly from Supabase...');
+  const { data, error } = await supabase
+    .from('inventory')
+    .select(`*, inventory_locations(*)`);
+
+  if (error) {
+    console.error("Supabase error fetching inventory:", error);
+    throw new Error(error.message);
+  }
+  
+  return data.map(item => ({
+    sku: item.sku,
+    productName: item.product_name,
+    totalQuantity: item.total_quantity,
+    locations: item.inventory_locations.map((loc: any) => ({
+      locationId: loc.location_id,
+      quantity: loc.quantity
+    }))
+  }));
 };
 
 export const updateInventoryStock = async (sku: string, totalQuantity: number): Promise<InventoryItem> => {
-    // Simulate a successful API call
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const itemIndex = mockInventoryDB.findIndex((item: InventoryItem) => item.sku === sku);
+  console.log(`[Service] Updating inventory for ${sku} to quantity ${totalQuantity} in Supabase`);
+  const { data, error } = await supabase
+    .from('inventory')
+    .update({ total_quantity: totalQuantity })
+    .eq('sku', sku)
+    .select()
+    .single();
 
-    if (itemIndex === -1) {
-        throw new Error('Inventory item not found');
-    }
+  if (error) {
+    console.error("Supabase error updating inventory stock:", error);
+    throw new Error(error.message);
+  }
 
-    // A simple update logic. A real app might need to adjust locations too.
-    mockInventoryDB[itemIndex] = { ...mockInventoryDB[itemIndex], totalQuantity };
-    
-    // Assuming the quantity is distributed to the first location for simplicity
-    if (mockInventoryDB[itemIndex].locations.length > 0) {
-        mockInventoryDB[itemIndex].locations[0].quantity = totalQuantity;
-    }
-
-
-    return Promise.resolve(mockInventoryDB[itemIndex]);
+  const result = data as any;
+  return {
+      sku: result.sku,
+      productName: result.product_name,
+      totalQuantity: result.total_quantity,
+      locations: [] // Assume unchanged on frontend, not returned by this update
+  };
 };
